@@ -1,5 +1,5 @@
 THREE = require("three");
-STLParser = require("../STLParser");
+STLParser = require("../stl-parser");
 fs = require("fs");
 
 describe("STL parser tests", function() {

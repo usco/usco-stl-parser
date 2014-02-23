@@ -10,7 +10,7 @@
   "dependencies": {},
   "devDependencies": {
     "jasmine-node": "",
-    "three": "~0.58.10",
+    "three-js": "git://github.com/usco/three.js.git",
     "composite-detect": "0.0.3"
   },
   "scripts": {

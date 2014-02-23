@@ -13,7 +13,7 @@
  * 	ASCII decoding assumes file is UTF-8. Seems to work for the examples...
  *
  * Usage:
- * 	var parser = new THREE.STLParser();
+ * 	var parser = new STLParser();
  *	var loader = new THREE.XHRLoader( parser );
  * 	loader.addEventListener( 'load', function ( event ) {
  *
@@ -24,17 +24,18 @@
  * 	loader.load( './models/stl/slotted_disk.stl' );
  */
 var detectEnv = require("composite-detect");
+if(detectEnv.isModule) var THREE = require("three");
 
-THREE.STLParser = function () {
+STLParser = function () {
   this.outputs = ["geometry"]; //to be able to auto determine data type(s) fetched by parser
 };
 
-THREE.STLParser.prototype = {
+STLParser.prototype = {
 
-	constructor: THREE.STLParser
+	constructor: STLParser
 };
 
-THREE.STLParser.prototype.parse = function (data) {
+STLParser.prototype.parse = function (data) {
 
 	var isBinary = function () {
 
@@ -56,7 +57,7 @@ THREE.STLParser.prototype.parse = function (data) {
 
 };
 
-THREE.STLParser.prototype.parseBinary = function (data) {
+STLParser.prototype.parseBinary = function (data) {
 
 	var face, geometry, n_faces, reader, length, normal, i, dataOffset, faceLength, start, vertexstart;
 
@@ -100,7 +101,7 @@ THREE.STLParser.prototype.parseBinary = function (data) {
 
 };
 
-THREE.STLParser.prototype.parseASCII = function (data) {
+STLParser.prototype.parseASCII = function (data) {
 
 	var geometry, length, normal, patternFace, patternNormal, patternVertex, result, text;
 	geometry = new THREE.Geometry();
@@ -138,7 +139,7 @@ THREE.STLParser.prototype.parseASCII = function (data) {
 
 };
 
-THREE.STLParser.prototype.ensureString = function (buf) {
+STLParser.prototype.ensureString = function (buf) {
 
 	if (typeof buf !== "string"){
 		var array_buffer = new Uint8Array(buf);
@@ -153,7 +154,7 @@ THREE.STLParser.prototype.ensureString = function (buf) {
 
 };
 
-THREE.STLParser.prototype.ensureBinary = function (buf) {
+STLParser.prototype.ensureBinary = function (buf) {
 
 	if (typeof buf === "string"){
 		var array_buffer = new Uint8Array(buf.length);
@@ -341,4 +342,4 @@ if ( typeof DataView === 'undefined'){
 
 }
 
-if (detectEnv.isModule) module.exports = THREE.STLParser;
+if (detectEnv.isModule) module.exports = STLParser;
