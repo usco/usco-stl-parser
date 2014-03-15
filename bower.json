@@ -6,6 +6,6 @@
   },
   "ignore": [
     "specs/",
-    "stl-parser.js"
+    "./stl-parser.js"
   ]
 }
