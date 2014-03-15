@@ -24,7 +24,8 @@
  * 	loader.load( './models/stl/slotted_disk.stl' );
  */
 var detectEnv = require("composite-detect");
-if(detectEnv.isModule) var THREE = require("three");
+if(detectEnv.isNode) var THREE = require("three");
+if(detectEnv.isBrowser) var THREE = window.THREE;
 
 STLParser = function () {
   this.outputs = ["geometry"]; //to be able to auto determine data type(s) fetched by parser
