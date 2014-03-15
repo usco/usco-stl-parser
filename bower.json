@@ -5,6 +5,7 @@
   "dependencies": {
   },
   "ignore": [
-    "specs/"
+    "specs/",
+    "stl-parser.js"
   ]
 }

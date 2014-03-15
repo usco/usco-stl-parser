@@ -7,11 +7,14 @@
     "url": "http://github.com/usco/usco-stl-parser.git"
   },
   "main": "STLParser.js",
-  "dependencies": {},
+  "dependencies": {
+    "composite-detect": "0.0.3",
+    "three-js": "git://github.com/usco/three.js.git"
+  },
   "devDependencies": {
     "jasmine-node": "",
-    "three-js": "git://github.com/usco/three.js.git",
-    "composite-detect": "0.0.3"
+    "grunt": "~0.4.2",
+    "grunt-browserify": "~1.2.12"
   },
   "scripts": {
     "test": "jasmine-node specs/"
