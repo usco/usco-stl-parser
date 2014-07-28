@@ -8,7 +8,8 @@ module.exports = (grunt) ->
         src: ["./stl-parser.js"]
         dest: "lib/stl-parser.js"
         options:
-          external: ["composite-detect","three"]
+          transform: ["workerify"]
+          external: ["composite-detect","three","q"]
           alias: ["./stl-parser.js:stl-parser"]
     bump:
       options:

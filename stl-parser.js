@@ -26,6 +26,7 @@
 var detectEnv = require("composite-detect");
 if(detectEnv.isNode) var THREE = require("three");
 if(detectEnv.isBrowser) var THREE = window.THREE;
+if (detectEnv.isModule) var Q = require('q');
 
 STLParser = function () {
   this.outputs = ["geometry"]; //to be able to auto determine data type(s) fetched by parser
@@ -39,12 +40,14 @@ STLParser.prototype.parse = function (data, parameters) {
 
   var parameters = parameters || {};
   var useBuffers = parameters.useBuffers !== undefined ? parameters.useBuffers : true;
-  parameters.useWorker = detectEnv.isBrowser;
+  var useWorker = parameters.useWorker !== undefined ?  parameters.useWorker && detectEnv.isBrowser: true;
+  
+  var deferred = Q.defer();
 
 	var isBinary = function () {
 
 		var expect, face_size, n_faces, reader;
-		reader = new DataView( binData );
+		reader = new DataView( binaryData );
 		face_size = (32 / 8 * 3) + ((32 / 8 * 3) * 3) + (16 / 8);
 		
 		n_faces = reader.getUint32(80,true);
@@ -53,16 +56,44 @@ STLParser.prototype.parse = function (data, parameters) {
 
 	};
 
-	var binData = this.ensureBinary( data );
-
-  if( isBinary() )
-  {
-    if( useBuffers ) return this.parseBinaryBuffers( binData );
-    return this.parseBinary( binData )
-  }
-  else{
-    this.parseASCII( this.ensureString( data ) );
-  }
+	var binaryData = this.ensureBinary( data );
+	var s = Date.now();
+	if ( useWorker ) {
+		var worker = new Worker( "./stl-worker.js" );
+		worker.onmessage = function( event ) {
+		  var vertices = event.data.vertices;
+		  var normals = event.data.normals;
+		  var geometry = new THREE.BufferGeometry();
+		  geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	    geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+	    
+	    var e1 = Date.now();
+	    console.log( "STL data parse time [worker]: " + (e1-s) + " ms" );
+	    deferred.resolve( geometry );
+		};
+		worker.postMessage( binaryData );
+		
+	}
+	else
+	{
+	  if( isBinary() )
+    {
+      if( useBuffers ){
+      
+      var parsedData = this.parseBinaryBuffers( binaryData );
+      var e1 = Date.now();
+	    console.log( "STL data parse time [non worker]: " + (e1-s) + " ms" );
+	    
+      deferred.resolve( parsedData );}
+      else{
+        deferred.resolve( this.parseBinary( binaryData ) );
+      }
+    }
+    else{
+      deferred.resolve( this.parseASCII( this.ensureString( data ) ) );
+    }
+	}
+	return deferred.promise;
 };
 
 STLParser.prototype.parseBinary = function (data) {
@@ -133,11 +164,8 @@ STLParser.prototype.parseBinaryBuffers = function (data) {
 			normals[ offset     ] = reader.getFloat32( start    , true );
 			normals[ offset + 1 ] = reader.getFloat32( start + 4, true );
 			normals[ offset + 2 ] = reader.getFloat32( start + 8, true );
-
 			offset += 3;
-
 		}
-
 	}
 
 	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
