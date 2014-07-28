@@ -90,7 +90,15 @@ STLParser.prototype.parse = function (data, parameters) {
       }
     }
     else{
-      deferred.resolve( this.parseASCII( this.ensureString( data ) ) );
+      if( useBuffers ){
+        var parsedData = this.parseASCIIBuffers( this.ensureString( data ) );
+        var e1 = Date.now();
+	      console.log( "STL [ascii] data parse time [non-worker]: " + (e1-s) + " ms" );
+        deferred.resolve( parsedData );
+      }
+      else{
+        deferred.resolve( this.parseASCII( this.ensureString( data ) ) );
+      }
     }
 	}
 	return deferred.promise;
@@ -168,6 +176,52 @@ STLParser.prototype.parseBinaryBuffers = function (data) {
 		}
 	}
 
+	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+	return geometry;
+};
+
+
+STLParser.prototype.parseASCIIBuffers = function (data) {
+
+  console.log("parsing ascii to bufffers");
+	var normal, patternFace, patternNormal, patternVertex, result, text;
+	patternFace = /facet([\s\S]*?)endfacet/g;
+
+  var posArray = [];
+  var normArray = [];
+  var indicesArray = [];
+  var faces = 0;
+  
+	while ( ( result = patternFace.exec( data ) ) !== null ) {
+    var length = 0;
+    
+		text = result[0];
+		patternNormal = /normal[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g;
+
+		while ( ( result = patternNormal.exec( text ) ) !== null ) {
+      normArray.push( parseFloat( result[ 1 ] ), parseFloat( result[ 3 ] ), parseFloat( result[ 5 ] ) );
+      normArray.push( parseFloat( result[ 1 ] ), parseFloat( result[ 3 ] ), parseFloat( result[ 5 ] ) );
+      normArray.push( parseFloat( result[ 1 ] ), parseFloat( result[ 3 ] ), parseFloat( result[ 5 ] ) );
+		}
+
+		patternVertex = /vertex[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g;
+
+		while ( ( result = patternVertex.exec( text ) ) !== null ) {
+
+      posArray.push( parseFloat( result[ 1 ] ), parseFloat( result[ 3 ] ), parseFloat( result[ 5 ] ) );
+      length += 1;
+		}
+		faces +=1;
+	}
+
+  var vertices = new Float32Array( faces * 3 * 3 );
+	var normals = new Float32Array( faces * 3 * 3 );
+	
+	vertices.set( posArray );
+	normals.set ( normArray );
+
+  var geometry = new THREE.BufferGeometry();
 	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 	geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 	return geometry;
