@@ -44,10 +44,9 @@ STLParser.prototype.parse = function (data, parameters) {
   
   var deferred = Q.defer();
 
-	var isBinary = function () {
-
+	var isBinary = function (data) {
 		var expect, face_size, n_faces, reader;
-		reader = new DataView( binaryData );
+		reader = new DataView( data );
 		face_size = (32 / 8 * 3) + ((32 / 8 * 3) * 3) + (16 / 8);
 		
 		n_faces = reader.getUint32(80,true);
@@ -56,37 +55,51 @@ STLParser.prototype.parse = function (data, parameters) {
 
 	};
 
-	var binaryData = this.ensureBinary( data );
+  var s = Date.now();
+	data = this.ensureBinary( data );
+	var isBinary = isBinary(data);
+	if(!isBinary){
+	  data = this.ensureString( data );
+	}
+	var e1 = Date.now();
+  console.log( "STL prepare time " + (e1-s) + " ms" );
+	
 	var s = Date.now();
 	if ( useWorker ) {
+	  var s3 = Date.now();
 		var worker = new Worker( "./stl-worker.js" );
 		worker.onmessage = function( event ) {
-		  var vertices = event.data.vertices;
-		  var normals = event.data.normals;
+		  var e3 = Date.now();
+		  var vertices = new Float32Array( event.data.vertices );
+		  var normals = new Float32Array( event.data.normals );
 		  var geometry = new THREE.BufferGeometry();
+		  var s2 = Date.now();
 		  geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 	    geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 	    
 	    var e1 = Date.now();
 	    console.log( "STL data parse time [worker]: " + (e1-s) + " ms" );
+	    console.log( "STL data parse time-creation [worker]: " + (e1-s2) + " ms" );
+	    console.log( "STL data parse time-to post [worker]: " + (e3-s3) + " ms" );
 	    deferred.resolve( geometry );
 		};
-		worker.postMessage( binaryData );
+		var s3 = Date.now();
+		worker.postMessage( {data:data,isBinary:isBinary});
 		
 	}
 	else
 	{
-	  if( isBinary() )
+	  if( isBinary )
     {
       if( useBuffers ){
       
-      var parsedData = this.parseBinaryBuffers( binaryData );
+      var parsedData = this.parseBinaryBuffers( data );
       var e1 = Date.now();
 	    console.log( "STL data parse time [non worker]: " + (e1-s) + " ms" );
 	    
       deferred.resolve( parsedData );}
       else{
-        deferred.resolve( this.parseBinary( binaryData ) );
+        deferred.resolve( this.parseBinary( data ) );
       }
     }
     else{
@@ -183,8 +196,6 @@ STLParser.prototype.parseBinaryBuffers = function (data) {
 
 
 STLParser.prototype.parseASCIIBuffers = function (data) {
-
-  console.log("parsing ascii to bufffers");
 	var normal, patternFace, patternNormal, patternVertex, result, text;
 	patternFace = /facet([\s\S]*?)endfacet/g;
 
