@@ -1,3 +1,6 @@
+//importScripts('./stl-utils.js');
+var stlUtils = require("./stl-utils.js");
+
 self.ensureBinary =function(buf){
 
 	if (typeof buf === "string"){
@@ -9,7 +12,6 @@ self.ensureBinary =function(buf){
 	} else {
 		return buf;
 	}
-
 }
 
 
@@ -90,9 +92,14 @@ self.parseBinary = function( data )
 
 self.onmessage = function( event ) {
   var data = event.data;
-  //data = self.ensureBinary(data );
-  var isBinary = data.isBinary;
   data = data.data;
+  data = stlUtils.ensureBinary( data );
+  var isBinary = stlUtils.isBinary(data);
+  if(!isBinary){
+    data = stlUtils.ensureString( data );
+  }
+  
+  
   var result = null;
   if( isBinary )
   {

@@ -55,15 +55,6 @@ STLParser.prototype.parse = function (data, parameters) {
 
 	};
 
-  var s = Date.now();
-	data = this.ensureBinary( data );
-	var isBinary = isBinary(data);
-	if(!isBinary){
-	  data = this.ensureString( data );
-	}
-	var e1 = Date.now();
-  console.log( "STL prepare time " + (e1-s) + " ms" );
-	
 	var s = Date.now();
 	if ( useWorker ) {
 	  var s3 = Date.now();
@@ -78,24 +69,36 @@ STLParser.prototype.parse = function (data, parameters) {
 	    geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 	    
 	    var e1 = Date.now();
-	    console.log( "STL data parse time [worker]: " + (e1-s) + " ms" );
-	    console.log( "STL data parse time-creation [worker]: " + (e1-s2) + " ms" );
-	    console.log( "STL data parse time-to post [worker]: " + (e3-s3) + " ms" );
+	    //console.log( "STL data parse time [worker]: " + (e1-s) + " ms" );
+	    //console.log( "STL data parse time-creation [worker]: " + (e1-s2) + " ms" );
+	    //console.log( "STL data parse time-to post [worker]: " + (e3-s3) + " ms" );
+	    deferred.notify( {"parsing":100,"total":vertices.length} )
 	    deferred.resolve( geometry );
 		};
 		var s3 = Date.now();
-		worker.postMessage( {data:data,isBinary:isBinary});
-		
+		worker.postMessage( {data:data});
+		Q.catch( deferred.promise, function(){
+		  worker.terminate()
+		});
 	}
 	else
 	{
+	  //var s = Date.now();
+	  data = this.ensureBinary( data );
+	  var isBinary = isBinary(data);
+	  if(!isBinary){
+	    data = this.ensureString( data );
+	  }
+	  //var e1 = Date.now();
+    //console.log( "STL prepare time " + (e1-s) + " ms" );
+	
 	  if( isBinary )
     {
       if( useBuffers ){
       
       var parsedData = this.parseBinaryBuffers( data );
-      var e1 = Date.now();
-	    console.log( "STL data parse time [non worker]: " + (e1-s) + " ms" );
+      //var e1 = Date.now();
+	    //console.log( "STL data parse time [non worker]: " + (e1-s) + " ms" );
 	    
       deferred.resolve( parsedData );}
       else{
@@ -106,7 +109,7 @@ STLParser.prototype.parse = function (data, parameters) {
       if( useBuffers ){
         var parsedData = this.parseASCIIBuffers( this.ensureString( data ) );
         var e1 = Date.now();
-	      console.log( "STL [ascii] data parse time [non-worker]: " + (e1-s) + " ms" );
+	      //console.log( "STL [ascii] data parse time [non-worker]: " + (e1-s) + " ms" );
         deferred.resolve( parsedData );
       }
       else{
@@ -114,7 +117,7 @@ STLParser.prototype.parse = function (data, parameters) {
       }
     }
 	}
-	return deferred.promise;
+	return deferred;
 };
 
 STLParser.prototype.parseBinary = function (data) {
@@ -308,14 +311,10 @@ STLParser.prototype.ensureBinary = function (buf) {
 if ( typeof DataView === 'undefined'){
 
 	DataView = function(buffer, byteOffset, byteLength){
-	
-		console.log("poue")
-
 		this.buffer = buffer;
 		this.byteOffset = byteOffset || 0;
 		this.byteLength = byteLength || buffer.byteLength || buffer.length;
 		this._isString = typeof buffer === "string";
-
 	}
 
 	DataView.prototype = {
