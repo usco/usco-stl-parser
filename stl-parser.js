@@ -24,11 +24,11 @@
  * 	loader.load( './models/stl/slotted_disk.stl' );
  */
 var detectEnv = require("composite-detect");
-if(detectEnv.isNode) var THREE = require("three");
 if(detectEnv.isBrowser) var THREE = window.THREE;
-if (detectEnv.isModule) var Q = require('q');
+if(detectEnv.isModule && !THREE) var THREE = require("three");
+if(detectEnv.isModule) var Q = require('q');
 
-STLParser = function () {
+var STLParser = function () {
   this.outputs = ["geometry"]; //to be able to auto determine data type(s) fetched by parser
 };
 
@@ -58,7 +58,10 @@ STLParser.prototype.parse = function (data, parameters) {
 	var s = Date.now();
 	if ( useWorker ) {
 	  var s3 = Date.now();
-		var worker = new Worker( "./stl-worker.js" );
+	  var Worker = require("./stl-worker.js");//Webpack worker!
+	  var worker = new Worker;
+		//var worker = new Worker( "./stl-worker.js" );//browserify
+
 		worker.onmessage = function( event ) {
 		  var e3 = Date.now();
 		  var vertices = new Float32Array( event.data.vertices );
@@ -97,6 +100,7 @@ STLParser.prototype.parse = function (data, parameters) {
       if( useBuffers ){
       
       var parsedData = this.parseBinaryBuffers( data );
+      console.log("parsing binary buffers")
       //var e1 = Date.now();
 	    //console.log( "STL data parse time [non worker]: " + (e1-s) + " ms" );
 	    
@@ -478,4 +482,5 @@ if ( typeof DataView === 'undefined'){
 
 }
 
-if (detectEnv.isModule) module.exports = STLParser;
+//if (detectEnv.isModule) module.exports = STLParser;
+module.exports = STLParser;

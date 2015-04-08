@@ -1,4 +1,4 @@
-ensureBinary = function (buf) {
+var ensureBinary = function (buf) {
 
 	if (typeof buf === "string"){
 		var array_buffer = new Uint8Array(buf.length);
@@ -12,7 +12,7 @@ ensureBinary = function (buf) {
 
 };
 
-ensureString = function (buf) {
+var ensureString = function (buf) {
 
 	if (typeof buf !== "string"){
 		var array_buffer = new Uint8Array(buf);
@@ -27,7 +27,7 @@ ensureString = function (buf) {
 
 };
 
-isBinary = function (data) {
+var isBinary = function (data) {
 		var expect, face_size, n_faces, reader;
 		reader = new DataView( data );
 		face_size = (32 / 8 * 3) + ((32 / 8 * 3) * 3) + (16 / 8);
