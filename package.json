@@ -8,8 +8,8 @@
   },
   "main": "stl-parser.js",
   "dependencies": {
-    "composite-detect": "0.0.3",
-    "three-js": "git://github.com/usco/three.js.git"
+    "q": "~0.9.7",
+    "composite-detect": "0.0.3"
   },
   "devDependencies": {
     "jasmine-node": "",
