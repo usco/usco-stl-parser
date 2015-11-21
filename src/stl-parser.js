@@ -24,8 +24,6 @@
  * 	loader.load( './models/stl/slotted_disk.stl' );
  */
 var detectEnv = require("composite-detect");
-if(detectEnv.isBrowser) var THREE = window.THREE;
-if(detectEnv.isModule && !THREE) var THREE = require("three");
 if(detectEnv.isModule) var Q = require('q');
 
 var STLParser = function () {
@@ -58,23 +56,19 @@ STLParser.prototype.parse = function (data, parameters) {
 	var s = Date.now();
 	if ( useWorker ) {
 	  var s3 = Date.now();
-	  var Worker = require("./stl-worker.js");//Webpack worker!
-	  var worker = new Worker;
-		//var worker = new Worker( "./stl-worker.js" );//browserify
+	  //var Worker = require("./stl-worker.js");//Webpack worker!
+	  //var worker = new Worker;
+		var worker = new Worker( "./stl-worker.js" );//browserify
 
 		worker.onmessage = function( event ) {
 		  var e3 = Date.now();
 		  var vertices = new Float32Array( event.data.vertices );
 		  var normals = new Float32Array( event.data.normals );
-		  var geometry = new THREE.BufferGeometry();
-		  var s2 = Date.now();
+		  var geometry = {vertices:vertices,normals:normals}
+		  /*new THREE.BufferGeometry();
 		  geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-	    geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+	    geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );*/
 	    
-	    var e1 = Date.now();
-	    //console.log( "STL data parse time [worker]: " + (e1-s) + " ms" );
-	    //console.log( "STL data parse time-creation [worker]: " + (e1-s2) + " ms" );
-	    //console.log( "STL data parse time-to post [worker]: " + (e3-s3) + " ms" );
 	    deferred.notify( {"parsing":100,"total":vertices.length} )
 	    deferred.resolve( geometry );
 		};
