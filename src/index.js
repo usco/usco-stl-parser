@@ -30,8 +30,7 @@ import detectEnv from 'composite-detect'
 import assign from 'fast.js/object/assign'
 import Rx from 'rx'
 
-import {parseASCII,parseBinary} from './parseHelpers'
-import {isDataBinary,ensureBinary,ensureString} from './utils'
+import {parseSteps} from './parseHelpers'
 
 export const outputs = ["geometry"] //to be able to auto determine data type(s) fetched by parser
 
@@ -66,16 +65,7 @@ export default function parse(data, parameters={}){
   }
   else
   {
-    data = ensureBinary( data )
-    const isBinary = isDataBinary(data)
-   
-    if( isBinary )
-    {
-      obs.onNext(  parseBinary( data ) ) 
-    }
-    else{
-      obs.onNext( parseASCII( ensureString( data ) ) ) 
-    }
+    obs.onNext( parseSteps( data ) )
   }
 
   return obs

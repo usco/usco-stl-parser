@@ -1,3 +1,21 @@
+import {isDataBinary,ensureBinary,ensureString} from './utils'
+
+export function parseSteps( data ){
+  data = ensureBinary( data )
+  const isBinary = isDataBinary(data)
+ 
+  let result = null
+  if( isBinary )
+  {
+    result = parseBinary( data )
+  }
+  else{
+    result = ensureString( parseASCII( data ) )
+  }
+  return result
+}
+
+
 export function parseBinary ( data )
 {
   var reader = new DataView( data )
