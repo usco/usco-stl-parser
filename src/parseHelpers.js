@@ -10,11 +10,10 @@ export function parseSteps( data ){
     result = parseBinary( data )
   }
   else{
-    result = ensureString( parseASCII( data ) )
+    result = parseASCII( ensureString( data ) )
   }
   return result
 }
-
 
 export function parseBinary ( data )
 {
@@ -91,10 +90,3 @@ export function parseASCII( data ) {
   return {vertices, normals}
 }
 
-
-export function geometryFromBuffers({vertices,normals}){
-  var geometry = new THREE.BufferGeometry()
-  geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) )
-  geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) )
-  return geometry
-}

@@ -2,11 +2,11 @@ import assert from 'assert'
 import fs from 'fs'
 
 //these two are needed by the parser
-import Rx from 'rx'
+//import Rx from 'rx'
+//let Rx = require('rx')
 import assign from 'fast.js/object/assign'
 
-
-import parse,  {outputs} from '../lib/stl-parser'
+import parse,  {outputs} from '../src/index' //'../lib/stl-parser'
 
 
 describe("STL parser", function() {
