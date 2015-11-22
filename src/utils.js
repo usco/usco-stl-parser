@@ -3,7 +3,7 @@ export function ensureString (buf) {
   if (typeof buf !== "string"){
     var array_buffer = new Uint8Array(buf)
     var str = ''
-    for(var i = 0 i < buf.byteLength; i++) {
+    for(var i = 0; i < buf.byteLength; i++) {
       str += String.fromCharCode(array_buffer[i]) // implicitly assumes little-endian
     }
     return str
@@ -27,7 +27,7 @@ export function ensureBinary (buf) {
 
 }
 
-export function isBinary (data) {
+export function isDataBinary (data) {
   var expect, face_size, n_faces, reader
   reader = new DataView( data )
   face_size = (32 / 8 * 3) + ((32 / 8 * 3) * 3) + (16 / 8)

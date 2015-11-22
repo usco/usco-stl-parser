@@ -1,23 +1,26 @@
 //importScripts('./stl-utils.js');
-var stlUtils = require("./stl-utils.js")
+//import {ensureBinary,ensureString} from './utils'
+//import {parseBinary,parseASCII} from './parseHelpers'
 
+var utils   = require('./utils')
+var helpers = require('./parseHelpers')
 
 self.onmessage = function( event ) {
   var data = event.data
   data = data.data
-  data = stlUtils.ensureBinary( data )
-  var isBinary = stlUtils.isBinary(data)
+  data = ensureBinary( data )
+  var isBinary = utils.isDataBinary(data)
   if(!isBinary){
-    data = stlUtils.ensureString( data )
+    data = utils.ensureString( data )
   }
   
   var result = null
   if( isBinary )
   {
-    result = stlUtils.parseBinary( data )
+    result = helpers.parseBinary( data )
   }
   else{ 
-    result = stlUtils.parseASCII( data ) 
+    result = helpers.parseASCII( data ) 
   }
 
   var vertices = result.vertices.buffer

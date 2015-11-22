@@ -17,21 +17,12 @@ and later in engine this fails :
 This repository contains both the:
 - node.js version:
 stl-parser.js at the root of the project
-- polymer.js/browser version which is a combo of
-lib/stl-parser.js (browserified version of the above)
-stl-parser.html
 
-
-How to generate browser/polymer.js version (with require support):
-------------------------------------------------------------------
-Type: 
-
-    grunt build-browser-lib
-
-This will generate the correct browser(ified) version of the source in the lib folder
 
 
 Usage with webpack
 ------------------
 
   just require / import the library (correctly points to stl-parser.js)
+
+     /* { test: /-worker*\.js$/, loader: "worker-loader",include : pathsToInclude},//if any module does "require(XXX-worker)" it converts to a web worker*/

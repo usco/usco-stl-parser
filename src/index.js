@@ -24,39 +24,46 @@
  *  } );
  *  loader.load( './models/stl/slotted_disk.stl' );
  */
-var detectEnv = require("composite-detect");
-if(detectEnv.isModule) var Q = require('q');
 
-const outputs = ["geometry"] //to be able to auto determine data type(s) fetched by parser
-
+//var detectEnv = require("composite-detect");
+import detectEnv from 'composite-detect'
+import assign from 'fast.js/object/assign'
+import Rx from 'rx'
 
 import {geometryFromBuffers
 ,parseASCII
 ,parseASCIIThree
 ,parseBinary
-,parseBinaryThree } from './stl-utils'
+,parseBinaryThree } from './parseHelpers'
+import {isDataBinary,ensureBinary,ensureString} from './utils'
 
-export default function parse(data, parameters){
+export const outputs = ["geometry"] //to be able to auto determine data type(s) fetched by parser
+
+export default function parse(data, parameters={}){
 
   const defaults = {
     useBuffers: true
-    ,useWorker: parameters.useBuffers && detectEnv.isBrowser :true
+    ,useWorker: (parameters.useBuffers ===true && detectEnv.isBrowser===true)
   }
   //var useWorker = parameters.useWorker !== undefined ?  parameters.useWorker && detectEnv.isBrowser: true
   parameters = assign({},defaults,parameters)
+  const {useWorker,useBuffers} = parameters
+
+
+  console.log("useWorker",useWorker,"useBuffers",useBuffers)
+
   const obs = new Rx.Subject()
 
   if ( useWorker ) {
-    //var Worker = require("./stl-worker.js")//Webpack worker!
+    var Worker = require("./worker.js")//Webpack worker!
     //var worker = new Worker
-    let worker = new Worker( "./stl-worker.js" )//browserify
+    //let worker = new Worker( "./stl-worker.js" )//browserify
 
     worker.onmessage = function( event ) {
       const vertices = new Float32Array( event.data.vertices )
       const normals = new Float32Array( event.data.normals )
       const geometry = {vertices:vertices,normals:normals}
-
-      
+ 
       obs.onNext({progress: 100, total:vertices.length}) 
       obs.onNext(geometry)
       obs.onCompleted()
@@ -66,11 +73,15 @@ export default function parse(data, parameters){
   }
   else
   {
-    data = this.ensureBinary( data )
-    const isBinary = isBinary(data)
+    console.log("here")
+    data = ensureBinary( data )
+    console.log("ensured data is binary")
+    const isBinary = isDataBinary(data)
+    console.log("is it binary",isBinary)
     if(!isBinary){
       data = ensureString( data )
     }
+    
   
     if( isBinary )
     {
@@ -86,6 +97,7 @@ export default function parse(data, parameters){
         obs.onNext( geometryFromBuffers( parseASCII( ensureString( data ) ) ) )
       }
       else{
+        console.log("parsing")
         obs.onNext( parseASCIIThree( ensureString( data ) ) )
       }
     }

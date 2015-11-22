@@ -37,7 +37,7 @@ export function parseBinaryThree (data) {
   return geometry
 }
 
-export function parseBinary = function( data )
+export function parseBinary ( data )
 {
   var reader = new DataView( data )
   var faces = reader.getUint32( 80, true )
