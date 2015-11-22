@@ -1,14 +1,12 @@
 var path = require('path')
 var webpack = require('webpack')
 
-
-console.log("__dirname",__dirname)
+//,query: {presets: ['es2015']}
 var ROOT_PATH  = './' //path.resolve(__dirname);
 var APP_PATH   = path.join(__dirname, 'src','index')//path.resolve(ROOT_PATH, 'src');
 var BUILD_PATH = path.join(__dirname, 'lib')//path.resolve(ROOT_PATH, 'lib');
 
-
-var babelLoader  = { test: /\.js?$/, exclude: /(node_modules)/,query: {presets: ['es2015']},loader: 'babel-loader'}
+var babelLoader  = { test: /\.js?$/, exclude: /(node_modules)/,loader: 'babel-loader'}
 var workerLoader = { test: /worker*\.js$/, loader: "worker-loader"}//,include : pathsToInclude}//if any module does "require(XXX-worker)" it converts to a web worker
 
 module.exports = {
@@ -21,11 +19,12 @@ module.exports = {
   },
   externals: {
     'rx':'Rx'
+    //,'fast.js/object/assign':'assign'
   },
   module:{
     loaders: [
-      babelLoader
-      ,workerLoader
+      workerLoader
+      ,babelLoader//keep this order !!!
     ]
   },
   worker: {

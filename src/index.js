@@ -29,12 +29,9 @@
 import detectEnv from 'composite-detect'
 import assign from 'fast.js/object/assign'
 import Rx from 'rx'
+//var Rx = require('rx')
 
-import {geometryFromBuffers
-,parseASCII
-,parseASCIIThree
-,parseBinary
-,parseBinaryThree } from './parseHelpers'
+import {parseASCII,parseBinary} from './parseHelpers'
 import {isDataBinary,ensureBinary,ensureString} from './utils'
 
 export const outputs = ["geometry"] //to be able to auto determine data type(s) fetched by parser
@@ -42,17 +39,15 @@ export const outputs = ["geometry"] //to be able to auto determine data type(s) 
 export default function parse(data, parameters={}){
 
   const defaults = {
-    useBuffers: true
-    ,useWorker: (parameters.useBuffers ===true && detectEnv.isBrowser===true)
+    useWorker: (detectEnv.isBrowser===true)
   }
-  //var useWorker = parameters.useWorker !== undefined ?  parameters.useWorker && detectEnv.isBrowser: true
   parameters = assign({},defaults,parameters)
-  const {useWorker,useBuffers} = parameters
+  const {useWorker} = parameters
 
 
-  console.log("useWorker",useWorker,"useBuffers",useBuffers)
+  console.log("useWorker",useWorker)
 
-  const obs = new Rx.Subject()
+  const obs = new Rx.ReplaySubject(1)
 
   if ( useWorker ) {
     var Worker = require("./worker.js")//Webpack worker!
@@ -73,33 +68,15 @@ export default function parse(data, parameters={}){
   }
   else
   {
-    console.log("here")
     data = ensureBinary( data )
-    console.log("ensured data is binary")
     const isBinary = isDataBinary(data)
-    console.log("is it binary",isBinary)
-    if(!isBinary){
-      data = ensureString( data )
-    }
-    
-  
+   
     if( isBinary )
     {
-      if( useBuffers ){
-        obs.onNext( geometryFromBuffers( parseBinary( data ) ) )
-      }
-      else{
-        obs.onNext( parseBinaryThree( data ) )
-      }
+      obs.onNext(  parseBinary( data ) ) 
     }
     else{
-      if( useBuffers ){
-        obs.onNext( geometryFromBuffers( parseASCII( ensureString( data ) ) ) )
-      }
-      else{
-        console.log("parsing")
-        obs.onNext( parseASCIIThree( ensureString( data ) ) )
-      }
+      obs.onNext( parseASCII( ensureString( data ) ) ) 
     }
   }
 

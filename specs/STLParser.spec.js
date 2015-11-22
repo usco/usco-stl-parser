@@ -1,32 +1,36 @@
-import assert from 'assert';
-import Rx from 'rx'
+import assert from 'assert'
 import fs from 'fs'
 
-import parse,  {outputs} from '../lib/stl-parser'
-//import from '../lib/stl-parser'
-//var pars = require('../lib/stl-parser')
+//these two are needed by the parser
+import Rx from 'rx'
+import assign from 'fast.js/object/assign'
 
-//console.log("STLParser",STLParser)
+
+import parse,  {outputs} from '../lib/stl-parser'
+
 
 describe("STL parser", function() {
   //console.log("Parser outputs", outputs, parse)
   
-  it("can parse ascii stl files", function() {
+  it("can parse ascii stl files", function(done) {
+    this.timeout(5000)
     let data = fs.readFileSync("specs/data/slotted_disk_ascii.stl",'binary')
-    parsedSTL = parse(data)
-    console.log("parsedSTL",parsedSTL)
-    //expect(parsedSTL instanceof THREE.Geometry).toBe(true)
-    //expect(parsedSTL.vertices.length).toEqual(864)
-  })
-   /*it(`should have 'run'`, done => {
-      assert.strictEqual(typeof run, `function`);
-      done();
-    });*/
+    let stlObs = parse(data) //we get an observable back
 
-  /*it("can parse binary stl files", function() {
-    data = fs.readFileSync("specs/data/pr2_head_pan_bin.stl",'binary')
-    parsedSTL = parser.parse(data)
-    expect(parsedSTL instanceof THREE.Geometry).toBe(true)
-    expect(parsedSTL.vertices.length).toEqual(3000)
-  })*/
+    stlObs.forEach(function(parsedSTL){
+      assert.equal(parsedSTL.vertices.length/3,864) //we divide by three because each entry is 3 long
+      done()
+    })
+  })
+
+  it("can parse binary stl files", done => {
+    let data = fs.readFileSync("specs/data/pr2_head_pan_bin.stl",'binary')
+    let stlObs = parse(data) //we get an observable back
+
+    stlObs.forEach(function(parsedSTL){
+      assert.equal(parsedSTL.vertices.length/3,3000) //we divide by three because each entry is 3 long
+      done()
+    })
+  })
+
 })

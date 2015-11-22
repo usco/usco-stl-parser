@@ -1,11 +1,11 @@
 //importScripts('./stl-utils.js');
-//import {ensureBinary,ensureString} from './utils'
-//import {parseBinary,parseASCII} from './parseHelpers'
+import {parseASCII,parseBinary} from './parseHelpers'
+import {isDataBinary,ensureBinary,ensureString} from './utils'
 
-var utils   = require('./utils')
-var helpers = require('./parseHelpers')
+/*var utils   = require('./utils')
+var helpers = require('./parseHelpers')*/
 
-self.onmessage = function( event ) {
+/*self.onmessage = function( event ) {
   var data = event.data
   data = data.data
   data = ensureBinary( data )
@@ -27,5 +27,25 @@ self.onmessage = function( event ) {
   var normals =  result.normals.buffer
   self.postMessage( {vertices:vertices, normals:normals}, [vertices,normals] )
 	self.close()
+
+}*/
+
+self.onmessage = function( event ) {
+  let data = ensureBinary( event.data.data )
+  const isBinary = isDataBinary(data)
+
+  let result = null
+  if( isBinary )
+  {
+    result = parseBinary( data )
+  }
+  else{ 
+    result = ensureString( parseASCII( data ) )
+  }
+
+  let vertices = result.vertices.buffer
+  let normals =  result.normals.buffer
+  self.postMessage( {vertices:vertices, normals:normals}, [vertices,normals] )
+  self.close()
 
 }
