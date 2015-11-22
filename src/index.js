@@ -29,12 +29,12 @@
 import detectEnv from 'composite-detect'
 import assign from 'fast.js/object/assign'
 import Rx from 'rx'
-//var Rx = require('rx')
 
 import {parseASCII,parseBinary} from './parseHelpers'
 import {isDataBinary,ensureBinary,ensureString} from './utils'
 
 export const outputs = ["geometry"] //to be able to auto determine data type(s) fetched by parser
+
 
 export default function parse(data, parameters={}){
 
@@ -44,26 +44,24 @@ export default function parse(data, parameters={}){
   parameters = assign({},defaults,parameters)
   const {useWorker} = parameters
 
-
-  console.log("useWorker",useWorker)
-
   const obs = new Rx.ReplaySubject(1)
 
   if ( useWorker ) {
-    var Worker = require("./worker.js")//Webpack worker!
+    //var Worker = require("./worker.js")//Webpack worker!
     //var worker = new Worker
-    //let worker = new Worker( "./stl-worker.js" )//browserify
 
+    let worker = new Worker( "./worker.js" )//browserify
     worker.onmessage = function( event ) {
       const vertices = new Float32Array( event.data.vertices )
       const normals = new Float32Array( event.data.normals )
       const geometry = {vertices:vertices,normals:normals}
  
-      obs.onNext({progress: 100, total:vertices.length}) 
+      //obs.onNext({progress: 100, total:vertices.length}) 
       obs.onNext(geometry)
       obs.onCompleted()
     }
-    worker.postMessage( {data:data})
+
+    worker.postMessage({data})
     obs.catch(e=>worker.terminate()) 
   }
   else

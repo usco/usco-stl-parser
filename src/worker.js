@@ -2,13 +2,16 @@
 import {parseASCII,parseBinary} from './parseHelpers'
 import {isDataBinary,ensureBinary,ensureString} from './utils'
 
-/*var utils   = require('./utils')
-var helpers = require('./parseHelpers')*/
+//var utils   = require('./utils')
+//var helpers = require('./parseHelpers')
+
 
 /*self.onmessage = function( event ) {
+  //console.log("in worker")
+
   var data = event.data
   data = data.data
-  data = ensureBinary( data )
+  data = utils.ensureBinary( data )
   var isBinary = utils.isDataBinary(data)
   if(!isBinary){
     data = utils.ensureString( data )
@@ -27,7 +30,6 @@ var helpers = require('./parseHelpers')*/
   var normals =  result.normals.buffer
   self.postMessage( {vertices:vertices, normals:normals}, [vertices,normals] )
 	self.close()
-
 }*/
 
 self.onmessage = function( event ) {

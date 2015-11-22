@@ -6,8 +6,12 @@ var ROOT_PATH  = './' //path.resolve(__dirname);
 var APP_PATH   = path.join(__dirname, 'src','index')//path.resolve(ROOT_PATH, 'src');
 var BUILD_PATH = path.join(__dirname, 'lib')//path.resolve(ROOT_PATH, 'lib');
 
+var pathsToInclude = []
+pathsToInclude.push( path.join(__dirname, 'src') )//"node_modules", "usco-stl-parser")   )
+
+
 var babelLoader  = { test: /\.js?$/, exclude: /(node_modules)/,loader: 'babel-loader'}
-var workerLoader = { test: /worker*\.js$/, loader: "worker-loader"}//,include : pathsToInclude}//if any module does "require(XXX-worker)" it converts to a web worker
+var workerLoader = { test: /worker*\.js$/, loader: "worker-loader", include : pathsToInclude}//if any module does "require(XXX-worker)" it converts to a web worker
 
 module.exports = {
   entry: APP_PATH,
@@ -16,6 +20,7 @@ module.exports = {
     ,filename: 'stl-parser.js'
     ,library: 'stlParser'
     ,libraryTarget: 'commonjs2'
+    ,publicPath : './lib/'
   },
   externals: {
     'rx':'Rx'
@@ -29,7 +34,7 @@ module.exports = {
   },
   worker: {
     output: {
-      filename: "stl-worker.js",
+      filename: "worker.js",
       chunkFilename: "[id].hash.worker.js"
     }
   }
