@@ -55,9 +55,12 @@ export default function parse(data, parameters={}){
       const normals = new Float32Array( event.data.normals )
       const geometry = {vertices:vertices,normals:normals}
  
-      //obs.onNext({progress: 100, total:vertices.length}) 
+      obs.onNext({progress: 100, total:vertices.length}) 
       obs.onNext(geometry)
       obs.onCompleted()
+    }
+    worker.onerror = function( event ){
+      obs.onError(`filename:${event.filename} lineno: ${event.lineno} error: ${event.message}`)
     }
 
     worker.postMessage({data})
@@ -65,7 +68,14 @@ export default function parse(data, parameters={}){
   }
   else
   {
-    obs.onNext( parseSteps( data ) )
+    try{
+      let result = parseSteps( data )
+      obs.onNext({progress: 100, total:result.vertices.length}) 
+      obs.onNext( result )
+      obs.onCompleted()
+    }catch(error){
+      obs.onError(error)
+    }
   }
 
   return obs

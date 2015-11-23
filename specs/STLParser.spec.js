@@ -33,4 +33,15 @@ describe("STL parser", function() {
     })
   })
 
+  it("should handle errors gracefully", done => {
+    let data = {foo:"42"}
+    let stlObs = parse(data) //we get an observable back
+
+    stlObs.forEach(undefined, function(error){
+      //console.log("error handle",JSON.stringify(error))
+      assert.equal(error.message,"First argument to DataView constructor must be an ArrayBuffer")
+      done()
+    })
+  })
+
 })
