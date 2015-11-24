@@ -55,7 +55,7 @@ export default function parse(data, parameters={}){
       const normals = new Float32Array( event.data.normals )
       const geometry = {vertices:vertices,normals:normals}
  
-      obs.onNext({progress: 100, total:vertices.length}) 
+      obs.onNext({progress: 1, total:vertices.length}) 
       obs.onNext(geometry)
       obs.onCompleted()
     }
@@ -70,7 +70,7 @@ export default function parse(data, parameters={}){
   {
     try{
       let result = parseSteps( data )
-      obs.onNext({progress: 100, total:result.vertices.length}) 
+      obs.onNext({progress: 1, total:result.vertices.length}) 
       obs.onNext( result )
       obs.onCompleted()
     }catch(error){
