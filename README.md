@@ -1,37 +1,28 @@
-stl format parser for USCO project, based on THREE.js STL parser
+stl format parser for USCO project
+
+originally based on THREE.js STL parser, but rather extensively modified.
+
+Optimized for speed in the browser (webworkers)
 
 
 General information
 -------------------
-An "implicit" dependency for now is three.js (v70)
-- for now it cannot be added to package.json since node's "require"
-and three.js' heavy use of "instanceOf" break things ie
 
-  geometry = new THREE.BufferGeometry() // in the local context
-  
-and later in engine this fails :
-
-  geometry instanceof THREE.BufferGeometry
-  
-
-This repository contains both the:
-- node.js version:
-stl-parser.js at the root of the project
-- polymer.js/browser version which is a combo of
-lib/stl-parser.js (browserified version of the above)
-stl-parser.html
+  - returns raw buffer data wrapped in an RxJs observable (soon to be most.js)
+  - useable both on Node.js & client side 
 
 
-How to generate browser/polymer.js version (with require support):
-------------------------------------------------------------------
-Type: 
-
-    grunt build-browser-lib
-
-This will generate the correct browser(ified) version of the source in the lib folder
-
-
-Usage with webpack
+Usage 
 ------------------
 
-  just require / import the library (correctly points to stl-parser.js)
+  
+          import parse,  {outputs} from '../lib/stl-parser'
+
+          let data = fs.readFileSync("mesh.stl",'binary')
+
+          let stlObs = parse(data) //we get an observable back
+
+          stlObs.forEach(function(parsedSTL){
+            //DO what you want with the data wich is something like {vertices,normals,etc}
+            console.log(parsedSTL) 
+          })
