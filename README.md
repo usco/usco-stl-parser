@@ -1,11 +1,14 @@
 ## Usco-stl-parser
 
+[![GitHub version](https://badge.fury.io/gh/usco%2Fusco-stl-parser.svg)](https://badge.fury.io/gh/usco%2Fusco-stl-parser)
+
 stl format parser for USCO project
 
 originally based on THREE.js STL parser, but rather extensively modified.
 (not dependenant, or using three.js anymore)
 
 Optimized for speed in the browser (webworkers etc)
+
 
 
 ## General information
