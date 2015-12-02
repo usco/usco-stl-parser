@@ -14,19 +14,28 @@
   },
   "devDependencies": {
     "assert": "^1.3.0",
-    "mocha": "^2.3.4",
     "babel-core": "^6.2.1",
     "babel-preset-es2015": "^6.1.18",
     "babelify": "^7.2.0",
+    "brfs": "^1.4.1",
     "browserify": "^12.0.1",
     "browserify-shim": "^3.8.11",
+    "browserify-test": "^2.1.2",
+    "mocha": "^2.3.4",
+    "mochify": "^2.14.2",
     "workerify": "^0.3.0"
   },
   "scripts": {
     "browserify": "browserify src/index.js -t babelify -t workerify -t browserify-shim --standalone stl-parser --exclude rx --outfile lib/stl-parser.js",
     "mocha": "mocha specs --compilers js:babel-core/register",
     "test": "npm run mocha",
-    "build":"npm run browserify"
+    "test-client": "browserify-test --transform babelify --transform workerify --transform brfs ",
+    "test-client2": "mochify --transform babelify --transform workerify --transform brfs",
+    "build": "npm run browserify",
+    "release": "npm run release-patch",
+    "release-patch": "git checkout master && release patch",
+    "release-minor": "git checkout master && release minor",
+    "release-major": "git checkout master && release major"
   },
   "browserify-shim": {
     "rx": "global:Rx"
