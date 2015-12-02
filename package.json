@@ -6,7 +6,7 @@
     "type": "git",
     "url": "http://github.com/usco/usco-stl-parser.git"
   },
-  "main": "src/index.js",
+  "main": "lib/stl-parser.js",
   "dependencies": {
     "composite-detect": "0.0.3",
     "fast.js": "^0.1.1",
