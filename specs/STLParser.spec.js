@@ -18,7 +18,7 @@ describe("STL parser", function() {
     let stlObs = parse(data) //we get an observable back
 
     stlObs.forEach(function(parsedSTL){
-      assert.equal(parsedSTL.vertices.length/3,864) //we divide by three because each entry is 3 long
+      assert.equal(parsedSTL.positions.length/3,864) //we divide by three because each entry is 3 long
       done()
     })
   })
@@ -28,7 +28,7 @@ describe("STL parser", function() {
     let stlObs = parse(data) //we get an observable back
 
     stlObs.forEach(function(parsedSTL){
-      assert.equal(parsedSTL.vertices.length/3,3000) //we divide by three because each entry is 3 long
+      assert.equal(parsedSTL.positions.length/3,3000) //we divide by three because each entry is 3 long
       done()
     })
   })

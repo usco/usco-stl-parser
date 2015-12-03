@@ -51,11 +51,11 @@ export default function parse(data, parameters={}){
 
     let worker = new Worker( "./worker.js" )//browserify
     worker.onmessage = function( event ) {
-      const vertices = new Float32Array( event.data.vertices )
+      const positions = new Float32Array( event.data.positions )
       const normals = new Float32Array( event.data.normals )
-      const geometry = {vertices:vertices,normals:normals}
+      const geometry = {positions,normals}
  
-      obs.onNext({progress: 1, total:vertices.length}) 
+      obs.onNext({progress: 1, total:positions.length}) 
       obs.onNext(geometry)
       obs.onCompleted()
     }
@@ -70,7 +70,7 @@ export default function parse(data, parameters={}){
   {
     try{
       let result = parseSteps( data )
-      obs.onNext({progress: 1, total:result.vertices.length}) 
+      obs.onNext({progress: 1, total:result.positions.length}) 
       obs.onNext( result )
       obs.onCompleted()
     }catch(error){

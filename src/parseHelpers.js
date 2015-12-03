@@ -23,7 +23,7 @@ export function parseBinary ( data )
   var faceLength = 12 * 4 + 2
   var offset = 0
   
-  var vertices = new Float32Array( faces * 3 * 3 )
+  var positions = new Float32Array( faces * 3 * 3 )
   var normals = new Float32Array( faces * 3 * 3 )
 
   for ( var face = 0; face < faces; face ++ ) {
@@ -34,9 +34,9 @@ export function parseBinary ( data )
 
       var vertexstart = start + i * 12
 
-      vertices[ offset     ] = reader.getFloat32( vertexstart, true )
-      vertices[ offset + 1 ] = reader.getFloat32( vertexstart + 4, true )
-      vertices[ offset + 2 ] = reader.getFloat32( vertexstart + 8, true )
+      positions[ offset     ] = reader.getFloat32( vertexstart, true )
+      positions[ offset + 1 ] = reader.getFloat32( vertexstart + 4, true )
+      positions[ offset + 2 ] = reader.getFloat32( vertexstart + 8, true )
 
       normals[ offset     ] = reader.getFloat32( start    , true )
       normals[ offset + 1 ] = reader.getFloat32( start + 4, true )
@@ -44,7 +44,7 @@ export function parseBinary ( data )
       offset += 3
     }
   }
-  return {vertices, normals}
+  return {positions, normals}
 }
 
 
@@ -81,12 +81,12 @@ export function parseASCII( data ) {
     faces +=1
   }
 
-  var vertices = new Float32Array( faces * 3 * 3 )
+  var positions = new Float32Array( faces * 3 * 3 )
   var normals = new Float32Array( faces * 3 * 3 )
   
-  vertices.set( posArray )
+  positions.set( posArray )
   normals.set ( normArray )
 
-  return {vertices, normals}
+  return {positions, normals}
 }
 
