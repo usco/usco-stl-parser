@@ -26,7 +26,12 @@
     "browserify": "browserify src/index.js -t babelify -t workerify -t browserify-shim --standalone stl-parser --exclude rx --outfile lib/stl-parser.js",
     "mocha": "mocha specs --compilers js:babel-core/register",
     "test": "npm run mocha",
-    "build":"npm run browserify"
+    "build":"npm run browserify",
+    "compile-lib": "babel -d lib/ src/",
+    "release": "npm run release-patch",
+    "release-patch": "git checkout master ; npm version patch && git push origin master --tags ",
+    "release-minor": "git checkout master ; npm version patch && git push origin master --tags ",
+    "release-major": "git checkout master ; npm version patch && git push origin master --tags "
   },
   "browserify-shim": {
     "rx": "global:Rx"
