@@ -6,7 +6,8 @@
     "type": "git",
     "url": "http://github.com/usco/usco-stl-parser.git"
   },
-  "main": "src/index.js",
+  "main": "lib/server/index.js",
+  "browser": "lib/browser/stl-parser.js",
   "dependencies": {
     "composite-detect": "0.0.3",
     "fast.js": "^0.1.1",
@@ -14,6 +15,7 @@
   },
   "devDependencies": {
     "assert": "^1.3.0",
+    "babel-cli": "^6.6.5",
     "babel-core": "^6.2.1",
     "babel-preset-es2015": "^6.1.18",
     "babelify": "^7.2.0",
@@ -26,12 +28,14 @@
     "workerify": "^0.3.0"
   },
   "scripts": {
-    "browserify": "browserify src/index.js -t babelify -t workerify -t browserify-shim --standalone stl-parser --exclude rx --outfile lib/stl-parser.js",
+    "browserify": "browserify src/index.js -t babelify -t workerify -t browserify-shim --standalone stl-parser --exclude rx --outfile lib/browser/stl-parser.js",
     "mocha": "mocha specs --compilers js:babel-core/register",
     "test": "npm run mocha",
     "test-client": "browserify-test --transform babelify --transform workerify --transform brfs ",
     "test-client2": "mochify --transform babelify --transform workerify --transform brfs",
-    "build": "npm run browserify",
+    "build-brs": "npm run browserify",
+    "build-srv": "babel -d lib/server src/",
+    "build":"npm run build-srv && npm run build-brs",
     "release": "npm run release-patch",
     "release-patch": "git checkout master && release patch",
     "release-minor": "git checkout master && release minor",
