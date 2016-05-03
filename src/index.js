@@ -25,6 +25,14 @@
  *  loader.load( './models/stl/slotted_disk.stl' )
  */
 
+/*er = Rx.DOM.fromWebWorker('worker.js');
+
+worker.subscribe(function (e) {
+    console.log(e.data);
+});
+
+worker.onNext('some data');*/
+
 // var detectEnv = require("composite-detect")
 import detectEnv from 'composite-detect'
 import assign from 'fast.js/object/assign'
@@ -34,7 +42,47 @@ import { parseSteps } from './parseHelpers'
 
 export const outputs = ['geometry'] // to be able to auto determine data type(s) fetched by parser
 
+import Worker from 'workerjs'
+
 export default function parse (data, parameters = {}) {
+  const worker$ = fromWebWorker('./worker.js')
+  worker$.onNext({data})
+
+  return worker$
+    .map(function (event) {
+      const positions = new Float32Array(event.data.positions)
+      const normals = new Float32Array(event.data.normals)
+      // obs.onCompleted()
+      obs.onNext({progress: 1, total: positions.length, data: {positions, normals}})
+    })
+    .catch(function (event) {
+      return `filename:${event.filename} lineno: ${event.lineno} error: ${event.message}`
+      // e => worker.terminate() ????
+    })
+}
+
+export default function parse_old2 (data, parameters = {}) {
+  const obs = new Rx.ReplaySubject(1)
+  const worker = new Worker('./worker.js', true)
+
+  worker.onmessage = function (event) {
+    const positions = new Float32Array(event.data.positions)
+    const normals = new Float32Array(event.data.normals)
+
+    obs.onNext({progress: 1, total: positions.length, data: {positions, normals}})
+    obs.onCompleted()
+  }
+  worker.onerror = function (event) {
+    obs.onError(`filename:${event.filename} lineno: ${event.lineno} error: ${event.message}`)
+  }
+
+  worker.postMessage({data})
+  obs.catch(e => worker.terminate())
+
+  return obs
+}
+
+export default function parse_old (data, parameters = {}) {
   const defaults = {
     useWorker: (detectEnv.isBrowser === true)
   }
@@ -48,14 +96,14 @@ export default function parse (data, parameters = {}) {
     // var worker = new Worker
 
     // TODO: for node.js side use https://github.com/audreyt/node-webworker-threads for similar speedups
+    //or rather https://github.com/eugeneware/workerjs
     let worker = new Worker('./worker.js') // browserify
     worker.onmessage = function (event) {
       const positions = new Float32Array(event.data.positions)
       const normals = new Float32Array(event.data.normals)
       const geometry = {positions, normals}
 
-      obs.onNext({progress: 1, total: positions.length})
-      obs.onNext(geometry)
+      obs.onNext({progress: 1, total: positions.length, data: geometry})
       obs.onCompleted()
     }
     worker.onerror = function (event) {
@@ -67,8 +115,7 @@ export default function parse (data, parameters = {}) {
   } else {
     try {
       let result = parseSteps(data)
-      obs.onNext({progress: 1, total: result.positions.length})
-      obs.onNext(result)
+      obs.onNext({progress: 1, total: result.positions.length, data: result})
       obs.onCompleted()
     } catch (error) {
       obs.onError(error)
