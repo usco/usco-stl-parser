@@ -19,9 +19,9 @@ export function parseBinary (data) {
   var dataOffset = 84
   var faceLength = 12 * 4 + 2
   var offset = 0
-  
-  var positions = new Float32Array( faces * 3 * 3 )
-  var normals = new Float32Array( faces * 3 * 3 )
+
+  var positions = new Float32Array(faces * 3 * 3)
+  var normals = new Float32Array(faces * 3 * 3)
 
   for (var face = 0; face < faces; face++) {
     var start = dataOffset + face * faceLength
@@ -75,7 +75,7 @@ export function parseASCII (data) {
 
   var positions = new Float32Array( faces * 3 * 3 )
   var normals = new Float32Array( faces * 3 * 3 )
-  
+
   positions.set( posArray )
   normals.set ( normArray )
 
