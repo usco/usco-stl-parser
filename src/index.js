@@ -44,7 +44,7 @@ export const outputs = ['geometry'] // to be able to auto determine data type(s)
 
 import Worker from 'workerjs'
 
-export default function parse (data, parameters = {}) {
+/*export default function parse (data, parameters = {}) {
   const worker$ = fromWebWorker('./worker.js')
   worker$.onNext({data})
 
@@ -59,11 +59,11 @@ export default function parse (data, parameters = {}) {
       return `filename:${event.filename} lineno: ${event.lineno} error: ${event.message}`
       // e => worker.terminate() ????
     })
-}
+}*/
 
-export default function parse_old2 (data, parameters = {}) {
+export default function parse (data, parameters = {}) {
   const obs = new Rx.ReplaySubject(1)
-  const worker = new Worker('./worker.js', true)
+  const worker = new Worker(__dirname + '/worker.js', true)
 
   worker.onmessage = function (event) {
     const positions = new Float32Array(event.data.positions)
@@ -82,7 +82,7 @@ export default function parse_old2 (data, parameters = {}) {
   return obs
 }
 
-export default function parse_old (data, parameters = {}) {
+/*export function parse_old (data, parameters = {}) {
   const defaults = {
     useWorker: (detectEnv.isBrowser === true)
   }
@@ -123,4 +123,4 @@ export default function parse_old (data, parameters = {}) {
   }
 
   return obs
-}
+}*/
