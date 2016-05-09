@@ -1,9 +1,8 @@
 //'use strict'
-// importScripts('./stl-utils.js')
 import { parseSteps } from './parseHelpers'
 //var parseSteps = require('./parseHelpers').parseSteps
 
-module.exports = function () {
+//module.exports = function () {
   self.onmessage = function (event) {
     let result = parseSteps(event.data.data)
 
@@ -18,4 +17,4 @@ module.exports = function () {
       self.close()
     }
   }
-}
+//}

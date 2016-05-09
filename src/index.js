@@ -36,13 +36,14 @@ worker.onNext('some data');*/
 // var detectEnv = require("composite-detect")
 import detectEnv from 'composite-detect'
 import assign from 'fast.js/object/assign'
-import Rx from 'rx'
 
 import { parseSteps } from './parseHelpers'
 
 export const outputs = ['geometry'] // to be able to auto determine data type(s) fetched by parser
 
-import Worker from 'workerjs'
+//import Worker from 'workerjs'
+import most from 'most'
+import thread from './thread'
 
 /*export default function parse (data, parameters = {}) {
   const worker$ = fromWebWorker('./worker.js')
@@ -61,25 +62,47 @@ import Worker from 'workerjs'
     })
 }*/
 
+class Worker {
+  constructor (path) {
+    this.path = path
+  }
+  postMessage (message) {
+    console.log('message', message)
+  }
+  /*onError (error) {
+    console.log(error)
+  }*/
+}
+
 export default function parse (data, parameters = {}) {
-  const obs = new Rx.ReplaySubject(1)
-  const worker = new Worker(__dirname + '/worker.js', true)
+  //const obs = new Rx.ReplaySubject(1)
+  const worker = thread('./worker.js') // new Worker('./worker.js') // browserify // __dirname + '/worker.js', true)
 
-  worker.onmessage = function (event) {
-    const positions = new Float32Array(event.data.positions)
-    const normals = new Float32Array(event.data.normals)
+  const stream = most.create(function (add, end, error) {
+    worker.onmessage = function (event) {
+      console.log('on message', event)
+      const positions = new Float32Array(event.data.positions)
+      const normals = new Float32Array(event.data.normals)
 
-    obs.onNext({progress: 1, total: positions.length, data: {positions, normals}})
-    obs.onCompleted()
-  }
-  worker.onerror = function (event) {
-    obs.onError(`filename:${event.filename} lineno: ${event.lineno} error: ${event.message}`)
-  }
 
-  worker.postMessage({data})
-  obs.catch(e => worker.terminate())
+      //obs.onNext({progress: 1, total: positions.length, data: {positions, normals}})
+      //obs.onCompleted()
+      add({progress: 1, total: positions.length, data: {positions, normals}})
+      end()
 
-  return obs
+      /*obs.onNext({progress: 1, total:positions.length})
+      obs.onNext(geometry)*/
+    }
+    worker.onerror = function (event) {
+      error(`filename:${event.filename} lineno: ${event.lineno} error: ${event.message}`)
+      //obs.onError(`filename:${event.filename} lineno: ${event.lineno} error: ${event.message}`)
+    }
+    worker.postMessage({data})
+    //obs.catch(e => worker.terminate())
+    return () => { worker.terminate() }
+  })
+
+  return stream
 }
 
 /*export function parse_old (data, parameters = {}) {
