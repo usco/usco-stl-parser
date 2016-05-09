@@ -11,6 +11,7 @@
   "dependencies": {
     "composite-detect": "0.0.3",
     "fast.js": "^0.1.1",
+    "most": "^0.19.3",
     "rx": "^4.0.7",
     "workerjs": "^0.1.1"
   },
@@ -29,7 +30,7 @@
     "workerify": "^0.3.0"
   },
   "scripts": {
-    "browserify": "browserify src/index.js -t babelify -t workerify -t browserify-shim --standalone stl-parser --exclude rx --outfile lib/browser/stl-parser.js",
+    "browserify": "browserify src/index.js -t babelify -t workerify -t browserify-shim --standalone stl-parser --exclude most --outfile lib/browser/stl-parser.js",
     "mocha": "mocha test --compilers js:babel-core/register",
     "test": "npm run mocha",
     "test-client": "browserify-test --transform babelify --transform workerify --transform brfs ",
@@ -43,7 +44,8 @@
     "release-major": "git checkout master && npm run build; git commit -a -m 'chore(dist): built release/'; npm version major && git push origin master --tags "
   },
   "browserify-shim": {
-    "rx": "global:Rx"
+    "rx": "global:Rx",
+    "most":"global:most"
   },
   "browserify": {
     "transform": [
