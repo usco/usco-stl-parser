@@ -6,7 +6,7 @@ const fs = require('fs')
 // import Rx from 'rx'
 // let Rx = require('rx')
 import assign from 'fast.js/object/assign'
-import parse, { outputs } from '../lib/server/index'
+import parse, { outputs } from '../src/index'
 // import parse, {outputs}'../lib/stl-parser'
 
 test.cb('STL parser tests: can parse ascii stl files', t => {
