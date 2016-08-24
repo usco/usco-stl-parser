@@ -9,10 +9,10 @@
   "main": "lib/server/index.js",
   "browser": "lib/browser/stl-parser.js",
   "dependencies": {
+    "@most/create": "^1.1.3",
     "composite-detect": "0.0.3",
     "fast.js": "^0.1.1",
-    "most": "^0.19.3",
-    "rx": "^4.0.7",
+    "most": "^1.0.1",
     "workerjs": "^0.1.1"
   },
   "devDependencies": {
@@ -41,7 +41,7 @@
   },
   "browserify-shim": {
     "rx": "global:Rx",
-    "most":"global:most"
+    "most": "global:most"
   },
   "browserify": {
     "transform": [
