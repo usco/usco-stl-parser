@@ -1,5 +1,30 @@
-import readAsStream from './readAsStream'
+const worker = new Worker('src/worker.js')
+let startTime
+let endTime
 
+worker.onmessage = function (event) {
+  console.log('on message', event.data)
+  console.log('data size', event.data.positions.byteLength)
+  // const positions = new Float32Array(event.data.positions)
+  // const normals = new Float32Array(event.data.normals)
+  endTime = new Date()
+}
+
+worker.onerror = function (event) {
+  console.error(event)
+// console.error(`filename:${event.filename} lineno: ${event.lineno} error: ${event.message}`)
+}
+
+let data = {size: 999999999} // 1048576*128}
+startTime = new Date()
+worker.postMessage(data)//, [data])
+
+// file input handling, mostly taken from http://www.html5rocks.com/en/tutorials/file/dndfiles/
+
+function readFileData(file){
+  let reader = new FileReader()
+
+}
 function handleFileSelect (e) {
   e.stopPropagation()
   e.preventDefault()
@@ -20,9 +45,6 @@ function handleFileSelect (e) {
 
   console.log('output', output)
   document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>'
-
-
-  readAsStream(_files[0])
 }
 
 function handleDragOver (e) {
@@ -35,5 +57,3 @@ function handleDragOver (e) {
 var dropZone = document.getElementById('drop_zone')
 dropZone.addEventListener('dragover', handleDragOver, false)
 dropZone.addEventListener('drop', handleFileSelect, false)
-
-console.log('dropZone', dropZone)
