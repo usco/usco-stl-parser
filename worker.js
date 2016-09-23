@@ -1,7 +1,7 @@
 function parseSteps (data) {
   return {
-    positions: new ArrayBuffer(data.size), //[0, 1, 2],
-    normals: new ArrayBuffer(data.size),//[2, 1, 0]
+    positions: new ArrayBuffer(1),//data.size), //[0, 1, 2],
+    normals: new ArrayBuffer(2)//data.size),//[2, 1, 0]
   }
 }
 

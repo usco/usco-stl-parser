@@ -1,7 +1,6 @@
 import readAsStream from './readAsStream'
 import readFileBasic from './readFileBasic'
-import workerTest from './workerTest'
-
+import workerSpawner from './workerSpawner'
 
 function repeat (times, fn, params) {
   for (var i = 0; i < times; i++) {
@@ -27,9 +26,15 @@ function handleFileSelect (e) {
 
   document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>'
 
-  const testCount = 10
-  //repeat(testCount, workerTest, files[0])
-  readFileBasic(files[0]).then(e=>console.log('fileData', e))
+  const testCount = 1
+
+  function testRun(){
+    readFileBasic(files[0]).then(workerSpawner.bind(null, {transferable: true}))
+    readFileBasic(files[0]).then(workerSpawner.bind(null, {transferable: false}))
+  }
+  repeat(testCount, testRun, files[0])
+
+// .then(e=>console.log('fileData', e))
 // readAsStream(files[0])
 }
 
