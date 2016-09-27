@@ -5,7 +5,7 @@ export default function readFileBasic (file) {
 
     reader.onload = function (openFile) {
       const fileData = openFile.target.result
-      console.log('openFile', openFile.target.result)
+      //console.log('openFile', openFile.target.result)
       resolve(fileData)
     }
     reader.readAsArrayBuffer(file)

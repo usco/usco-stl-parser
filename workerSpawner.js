@@ -26,8 +26,10 @@ export default function workerSpawner (params, rawData) {
   startTime = new Date()
 
   if (transferable) {
+    console.log('sending data to worker in transferable mode')
     worker.postMessage(data, [data])
   } else {
-    worker.postMessage(data) // , [data])
+    console.log('sending data to worker in copy mode')
+    worker.postMessage(data)
   }
 }

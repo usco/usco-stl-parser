@@ -28,11 +28,21 @@ function handleFileSelect (e) {
 
   const testCount = 1
 
-  function testRun(){
+  function testRunTransferable(){
     readFileBasic(files[0]).then(workerSpawner.bind(null, {transferable: true}))
+  }
+
+  function testRunCopy(){
     readFileBasic(files[0]).then(workerSpawner.bind(null, {transferable: false}))
   }
-  repeat(testCount, testRun, files[0])
+
+  function testRunStream(){
+    readAsStream(files[0])
+  }
+
+  repeat(testCount, testRunTransferable, files[0])
+  repeat(testCount, testRunCopy, files[0])
+  repeat(testCount, testRunStream, files[0])
 
 // .then(e=>console.log('fileData', e))
 // readAsStream(files[0])
