@@ -51,8 +51,6 @@ function handleFileSelect (e) {
 
     callback(null, chunk)
   })*/
-
-
     readAsStream(files[0]).pipe(workerStream)
   }
 
