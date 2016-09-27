@@ -146,7 +146,7 @@ function isDataBinary(data) {
 },{}],3:[function(require,module,exports){
 'use strict';
 
-var _parseHelpers = require('./parsers/stl/parseHelpers.js');
+var _parseHelpers = require('../parsers/stl/parseHelpers.js');
 
 var _parseHelpers2 = _interopRequireDefault(_parseHelpers);
 
@@ -168,4 +168,4 @@ self.onmessage = function (event) {
   }
 };
 
-},{"./parsers/stl/parseHelpers.js":1}]},{},[3]);
+},{"../parsers/stl/parseHelpers.js":1}]},{},[3]);

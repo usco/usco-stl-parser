@@ -1,7 +1,7 @@
 export default function workerSpawner (params, rawData) {
   const {transferable} = params
   const mode = transferable ? 'standard transferable' : 'standard copy'
-  const worker = new Worker('src/worker.js')
+  const worker = new Worker('src/workers/worker.js')
   let startTime
   let endTime
 

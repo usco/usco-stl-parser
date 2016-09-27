@@ -1,8 +1,8 @@
 //import readFileAsStream from './readFileAsStream'
 import fileReaderStream from 'filereader-stream'
 import readFileBasic from './readFileBasic'
-import workerSpawner from './workerSpawner'
-import streamWorkerSpawner from './streamWorkerSpawner'
+import workerSpawner from './workers/workerSpawner'
+import streamWorkerSpawner from './workers/streamWorkerSpawner'
 
 function repeat (times, fn, params) {
   for (var i = 0; i < times; i++) {
