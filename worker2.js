@@ -154,7 +154,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 self.onmessage = function (event) {
   //console.log('event',event.data)
-  var result = (0, _parseHelpers2.default)(event.data);
+  var result = (0, _parseHelpers2.default)(event.data.buffer);
 
   var positions = result.positions.buffer;
   var normals = result.normals.buffer;
@@ -166,11 +166,6 @@ self.onmessage = function (event) {
   if ('close' in self) {
     self.close();
   }
-}; /*function parseSteps (data) {
-     return {
-       positions: new ArrayBuffer(1),//data.size), //[0, 1, 2],
-       normals: new ArrayBuffer(2)//data.size),//[2, 1, 0]
-     }
-   }*/
+};
 
 },{"./parsers/stl/parseHelpers.js":1}]},{},[3]);

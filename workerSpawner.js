@@ -6,6 +6,7 @@ export default function workerSpawner (params, rawData) {
   let endTime
 
   worker.onmessage = function (event) {
+    console.log('recieved data from worker', event.data)
     //console.log('on message', event.data)
     //console.log('data size', event.data.positions.byteLength)
     // const positions = new Float32Array(event.data.positions)
