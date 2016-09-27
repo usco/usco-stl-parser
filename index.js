@@ -1,6 +1,7 @@
 import readAsStream from './readAsStream'
 import readFileBasic from './readFileBasic'
 import workerSpawner from './workerSpawner'
+import streamWorkerSpawner from './streamWorkerSpawner'
 
 function repeat (times, fn, params) {
   for (var i = 0; i < times; i++) {
@@ -37,7 +38,22 @@ function handleFileSelect (e) {
   }
 
   function testRunStream(){
-    readAsStream(files[0])
+    const workerStream =  streamWorkerSpawner.bind(null, {transferable: false})()
+    /*const through2 = require('through2')
+
+    let ws = through2(function (chunk, enc, callback) {
+      console.log('here', chunk, enc, callback)
+    for (var i = 0; i < chunk.length; i++)
+      if (chunk[i] == 97)
+        chunk[i] = 122 // swap 'a' for 'z'
+
+    //this.push(chunk)
+
+    callback(null, chunk)
+  })*/
+
+
+    readAsStream(files[0]).pipe(workerStream)
   }
 
   repeat(testCount, testRunTransferable, files[0])
