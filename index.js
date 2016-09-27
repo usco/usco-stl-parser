@@ -1,4 +1,5 @@
-import readAsStream from './readAsStream'
+//import readFileAsStream from './readFileAsStream'
+import fileReaderStream from 'filereader-stream'
 import readFileBasic from './readFileBasic'
 import workerSpawner from './workerSpawner'
 import streamWorkerSpawner from './streamWorkerSpawner'
@@ -51,7 +52,7 @@ function handleFileSelect (e) {
 
     callback(null, chunk)
   })*/
-    readAsStream(files[0]).pipe(workerStream)
+    fileReaderStream(files[0], {chunkSize: 9999999999}).pipe(workerStream)
   }
 
   repeat(testCount, testRunTransferable, files[0])
