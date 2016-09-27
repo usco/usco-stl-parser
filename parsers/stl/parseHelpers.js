@@ -11,6 +11,9 @@ export default function parseSteps (data) {
     result = parseASCII(ensureString(data))
   }
   return result
+
+  //  return isBinary ? parseBinary(data) : parseASCII(ensureString(data))
+
 }
 
 export function parseBinary (data) {

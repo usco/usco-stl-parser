@@ -15,16 +15,16 @@ export function ensureString (buf) {
 }
 
 export function ensureBinary (buf) {
-  console.log('ensureBinary')
+  //console.log('ensureBinary')
   if (typeof buf === 'string') {
-    console.log('forcing binary')
+    //console.log('forcing binary')
     var array_buffer = new Uint8Array(buf.length)
     for (var i = 0; i < buf.length; i++) {
       array_buffer[i] = buf.charCodeAt(i) & 0xff // implicitly assumes little-endian
     }
     return array_buffer.buffer || array_buffer
   } else {
-    console.log('already binary')
+    //console.log('already binary')
     return buf
   }
 }

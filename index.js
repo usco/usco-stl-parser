@@ -1,9 +1,10 @@
-//import readFileAsStream from './readFileAsStream'
 import fileReaderStream from 'filereader-stream'
 import readFileBasic from './readFileBasic'
 import workerSpawner from './workers/workerSpawner'
 import streamWorkerSpawner from './workers/streamWorkerSpawner'
 
+//not worker based, for dev/testing
+import {default as makeStlStreamParser} from './parsers/stl/parseStream'
 function repeat (times, fn, params) {
   for (var i = 0; i < times; i++) {
     fn(params)
@@ -55,12 +56,28 @@ function handleFileSelect (e) {
     fileReaderStream(files[0], {chunkSize: 9999999999}).pipe(workerStream)
   }
 
-  repeat(testCount, testRunTransferable, files[0])
+  /*repeat(testCount, testRunTransferable, files[0])
   repeat(testCount, testRunCopy, files[0])
-  repeat(testCount, testRunStream, files[0])
+  repeat(testCount, testRunStream, files[0])*/
+  const through2 = require('through2')
+  const concat = require('concat-stream')
 
-// .then(e=>console.log('fileData', e))
-// readAsStream(files[0])
+  const final = function (chunk, enc, callback) {
+    console.log('here', chunk, enc, callback)
+    this.push(chunk)
+    //callback(null, chunk)
+  }
+
+
+  fileReaderStream(files[0])
+    .pipe(makeStlStreamParser())
+    /*.on('end', function () {
+      console.log('done')
+    })*/
+    //.pipe(through2(final))
+    .pipe(concat(function(data) {
+      console.log('end of data',data)
+    }))
 }
 
 function handleDragOver (e) {
