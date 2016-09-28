@@ -42,7 +42,7 @@ export default function makeStlStreamParser () {
       // FIXME meh , we are allocating data for the whole thing: not great, except in 'accumulator' mode
       // positions = new Float32Array(faces * 3 * 3)
       // normals = new Float32Array(faces * 3 * 3)
-      console.log('faces', faces, 'chunk size', chunk.length, 'workChunk', workChunk.length)
+      //console.log('faces', faces, 'chunk size', chunk.length, 'workChunk', workChunk.length)
       remainingDataInChunk = workChunk.length - dataStartOffset
 
       startOffset = dataStartOffset
@@ -75,7 +75,7 @@ export default function makeStlStreamParser () {
       }
       lface += 1
     }
-    console.log('faceOffset', faceOffset, 'facesInChunk', facesInChunk, 'remainderDataLength', remainderDataLength, 'current face ', face)
+    //console.log('faceOffset', faceOffset, 'facesInChunk', facesInChunk, 'remainderDataLength', remainderDataLength, 'current face ', face)
 
     // update size
     chunkNb += 1
@@ -85,7 +85,7 @@ export default function makeStlStreamParser () {
     previousRemainderData = workChunk.slice(workChunk.length - remainderDataLength)
     faceOffset = face
 
-    console.log('previousRemainderData', previousRemainderData)
+    //console.log('previousRemainderData', previousRemainderData)
 
     // we can only send a single buffer out , so concat the two
     const positionsBuffer = new Buffer(positions)

@@ -41,43 +41,50 @@ function handleFileSelect (e) {
 
   function testRunStream(){
     const workerStream =  streamWorkerSpawner.bind(null, {transferable: false})()
-    /*const through2 = require('through2')
-
-    let ws = through2(function (chunk, enc, callback) {
-      console.log('here', chunk, enc, callback)
-    for (var i = 0; i < chunk.length; i++)
-      if (chunk[i] == 97)
-        chunk[i] = 122 // swap 'a' for 'z'
-
-    //this.push(chunk)
-
-    callback(null, chunk)
-  })*/
     fileReaderStream(files[0], {chunkSize: 9999999999}).pipe(workerStream)
   }
 
-  /*repeat(testCount, testRunTransferable, files[0])
+  repeat(testCount, testRunTransferable, files[0])
   repeat(testCount, testRunCopy, files[0])
-  repeat(testCount, testRunStream, files[0])*/
+  repeat(testCount, testRunStream, files[0])
+
   const through2 = require('through2')
   const concat = require('concat-stream')
 
-  const final = function (chunk, enc, callback) {
-    console.log('here', chunk, enc, callback)
-    this.push(chunk)
-    //callback(null, chunk)
+  const record = function (chunk, enc, callback) {
+    //console.log('here', chunk, enc, callback)
+    //this.push(chunk)
+    callback(null, chunk)
   }
 
+  const Writable = require('stream').Writable
 
-  fileReaderStream(files[0])
+  let startTime
+  let endTime
+
+  const bucketTest = new Writable({
+    write: function(chunk, encoding, next) {
+      //console.log(chunk.toString())
+      //console.log('chunk', chunk, chunk.length)
+      next()
+    }
+  })
+
+
+  const fileStream = fileReaderStream(files[0])
+  startTime = new Date()
+  let pipeline = fileStream
+    //.pipe(through2(record))
     .pipe(makeStlStreamParser())
-    /*.on('end', function () {
-      console.log('done')
-    })*/
-    //.pipe(through2(final))
-    .pipe(concat(function(data) {
+    .pipe(bucketTest)
+    /*.pipe(concat(function(data) {
       console.log('end of data',data)
-    }))
+    }))*/
+  pipeline.on('finish', function () {
+    console.log('done')
+    endTime = new Date()
+    console.log(`Mode: streaming, no worker,  elapsed: `, endTime - startTime)
+  })
 }
 
 function handleDragOver (e) {
