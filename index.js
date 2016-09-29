@@ -3,6 +3,8 @@ import readFileBasic from './readFileBasic'
 import workerSpawner from './workers/workerSpawner'
 import streamWorkerSpawner from './workers/streamWorkerSpawner'
 
+var foo = require('./workers/testLaunchWorker')
+
 // not worker based, for dev/testing
 import { default as makeStlStreamParser } from './parsers/stl/parseStream'
 function repeat (times, fn, params) {
@@ -40,13 +42,17 @@ function handleFileSelect (e) {
   }
 
   function testRunStream () {
+    const concat = require('concat-stream')
+
     const workerStream = streamWorkerSpawner.bind(null, {transferable: false})()
-    fileReaderStream(files[0], {chunkSize: 9999999999}).pipe(workerStream)
+    fileReaderStream(files[0], {chunkSize: 9999999999}).pipe(workerStream).pipe(concat(function(data) {
+      console.log('after worker')
+    }))
   }
 
-  repeat(testCount, testRunTransferable, files[0])
-    /*repeat(testCount, testRunCopy, files[0])
-  repeat(testCount, testRunStream, files[0])*/
+  //repeat(testCount, testRunTransferable, files[0])
+  //repeat(testCount, testRunCopy, files[0])
+  repeat(testCount, testRunStream, files[0])
 
   const through2 = require('through2')
   const concat = require('concat-stream')
@@ -80,7 +86,7 @@ function handleFileSelect (e) {
   })
 
   //[512,1024,]
-  const chunkSize = 512//1100
+  const chunkSize = 1024//1100
 
   const fileStream = fileReaderStream(files[0], {chunkSize: chunkSize*chunkSize})
   startTime = new Date()
