@@ -12,15 +12,14 @@ export default function makeStlStreamParser () {
 
   const parser = function (chunk, enc, callback) {
     // console.log('chunk', chunk.length, chunkNb)
-    let workChunk = previousRemainderData ? Buffer.concat([previousRemainderData, chunk]) : chunk
-    workChunk = ensureBinary(workChunk)
-
     if (chunkNb === 0) {
-      isBinary = isDataBinaryRobust(workChunk.buffer)
+      isBinary = isDataBinaryRobust(chunk.buffer)
     }
-    const {remainingDataInChunk, startOffset} = computeBinaryOffset(workChunk, chunkNb)
+    const workChunk = computeWorkChunk(chunk, isBinary, previousRemainderData)
 
-    const parsed = isBinary ? parseBinaryChunk(faceOffset, remainingDataInChunk, startOffset, workChunk) : parseASCII(ensureString(workChunk))
+    const {remainingDataInChunk, startOffset} = isBinary ? computeBinaryOffset(workChunk, chunkNb) : computASCIIOffset(workChunk, chunkNb)
+
+    const parsed = isBinary ? parseBinaryChunk(faceOffset, remainingDataInChunk, startOffset, workChunk) : parseASCIIChunk(workChunk)
     // console.log('faceOffset', faceOffset, 'facesInChunk', facesInChunk, 'remainderDataLength', remainderDataLength, 'current face ', face)
 
     // update size
@@ -50,12 +49,29 @@ function toBuffer (arr) {
   return buf
 }
 
+function computeWorkChunk (chunk, isBinary, previousRemainderData) {
+  let workChunk
+  /*if (isBinary) {
+    workChunk = previousRemainderData ? Buffer.concat([previousRemainderData, chunk]) : chunk
+  } else {
+    console.log('chunk', ensureString(chunk))
+    workChunk = previousRemainderData ? chunk : chunk
+  }*/
+  workChunk = previousRemainderData ? Buffer.concat([previousRemainderData, chunk]) : chunk
+  //console.log('chunk', ensureString(workChunk))
+  return ensureBinary(workChunk)
+}
+
 function computeBinaryOffset (workChunk, chunkNb) {
   const dataStartOffset = 84
   const remainingDataInChunk = chunkNb === 0 ? workChunk.length - dataStartOffset : workChunk.length
   const startOffset = chunkNb === 0 ? dataStartOffset : 0
 
   return {remainingDataInChunk, startOffset}
+}
+
+function computASCIIOffset (workChunk, chunkNb) {
+  return {remainingDataInChunk: workChunk.length, startOffset: 0}
 }
 
 function parseBinaryChunk (faceOffset, remainingDataInChunk, startOffset, workChunk) {
@@ -97,29 +113,31 @@ function parseBinaryChunk (faceOffset, remainingDataInChunk, startOffset, workCh
 }
 
 // ASCII stl parsing
-export function parseASCII (data) {
+export function parseASCIIChunk (workChunk) {
+  const data = ensureString(workChunk)
   // console.log('parseASCII')
-  var normal, patternFace, patternNormal, patternVertex, result, text
-  patternFace = /facet([\s\S]*?)endfacet/g
+  let result, text
+  const patternNormal = /normal[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g
+  const patternVertex = /vertex[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g
+  const patternFace = /facet([\s\S]*?)endfacet/g
 
-  var posArray = []
-  var normArray = []
-  // var indicesArray = []
-  var faces = 0
+  let posArray = []
+  let normArray = []
+
+  let faces = 0
+  let offset = 0
 
   while ((result = patternFace.exec(data)) !== null) {
     var length = 0
 
     text = result[0]
-    patternNormal = /normal[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g
+    offset = result.index + text.length
 
     while ((result = patternNormal.exec(text)) !== null) {
       normArray.push(parseFloat(result[ 1 ]), parseFloat(result[ 3 ]), parseFloat(result[ 5 ]))
       normArray.push(parseFloat(result[ 1 ]), parseFloat(result[ 3 ]), parseFloat(result[ 5 ]))
       normArray.push(parseFloat(result[ 1 ]), parseFloat(result[ 3 ]), parseFloat(result[ 5 ]))
     }
-
-    patternVertex = /vertex[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g
 
     while ((result = patternVertex.exec(text)) !== null) {
       posArray.push(parseFloat(result[ 1 ]), parseFloat(result[ 3 ]), parseFloat(result[ 5 ]))
@@ -128,11 +146,15 @@ export function parseASCII (data) {
     faces += 1
   }
 
-  var positions = new Float32Array(faces * 3 * 3)
-  var normals = new Float32Array(faces * 3 * 3)
+  let positions = new Float32Array(faces * 3 * 3)
+  let normals = new Float32Array(faces * 3 * 3)
 
   positions.set(posArray)
   normals.set(normArray)
 
-  return {face: faces, positions, normals}
+  // compute offsets, remainderData etc for next chunk etc
+  const remainderTextData = data.slice(offset)
+  //console.log('remainderData', remainderTextData)
+  const remainderData = new Buffer(remainderTextData)
+  return {faceOffset: faces, remainderData, positions, normals}
 }

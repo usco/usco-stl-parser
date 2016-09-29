@@ -80,7 +80,7 @@ function handleFileSelect (e) {
   })
 
   //[512,1024,]
-  const chunkSize = 1100
+  const chunkSize = 512//1100
 
   const fileStream = fileReaderStream(files[0], {chunkSize: chunkSize*chunkSize})
   startTime = new Date()
