@@ -15,7 +15,7 @@ export default function makeStlStreamParser () {
     if (chunkNb === 0) {
       isBinary = isDataBinaryRobust(chunk.buffer)
     }
-    const workChunk = computeWorkChunk(chunk, isBinary, previousRemainderData)
+    const workChunk = ensureBinary(previousRemainderData ? Buffer.concat([previousRemainderData, chunk]) : chunk)
 
     const {remainingDataInChunk, startOffset} = isBinary ? computeBinaryOffset(workChunk, chunkNb) : computASCIIOffset(workChunk, chunkNb)
 
@@ -47,19 +47,6 @@ function toBuffer (arr) {
     buf = buf.slice(arr.byteOffset, arr.byteOffset + arr.byteLength)
   }
   return buf
-}
-
-function computeWorkChunk (chunk, isBinary, previousRemainderData) {
-  let workChunk
-  /*if (isBinary) {
-    workChunk = previousRemainderData ? Buffer.concat([previousRemainderData, chunk]) : chunk
-  } else {
-    console.log('chunk', ensureString(chunk))
-    workChunk = previousRemainderData ? chunk : chunk
-  }*/
-  workChunk = previousRemainderData ? Buffer.concat([previousRemainderData, chunk]) : chunk
-  //console.log('chunk', ensureString(workChunk))
-  return ensureBinary(workChunk)
 }
 
 function computeBinaryOffset (workChunk, chunkNb) {
@@ -154,7 +141,7 @@ export function parseASCIIChunk (workChunk) {
 
   // compute offsets, remainderData etc for next chunk etc
   const remainderTextData = data.slice(offset)
-  //console.log('remainderData', remainderTextData)
+  // console.log('remainderData', remainderTextData)
   const remainderData = new Buffer(remainderTextData)
   return {faceOffset: faces, remainderData, positions, normals}
 }
