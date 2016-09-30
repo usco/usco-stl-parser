@@ -1,7 +1,6 @@
 var ParentStream = require('workerstream/parent')
 const through2 = require('through2')
 const concat = require('concat-stream')
-import { default as makeStlStreamParser } from '../parsers/stl/parseStream'
 
 const observer = function (chunk, enc, callback) {
   console.log('chunk inside worker', chunk.toString('utf8'))
@@ -12,7 +11,6 @@ module.exports = function () {
   var parentStream = ParentStream()
   parentStream
     .pipe(through2(observer))
-    //.pipe(makeStlStreamParser())
     /*.pipe(concat(function (data) {
       console.log('data in worker', data)
     }))*/

@@ -11,7 +11,7 @@ export default function makeStlStreamParser () {
   let previousRemainderData
 
   const parser = function (chunk, enc, callback) {
-    // console.log('chunk', chunk.length, chunkNb)
+    console.log('chunk', chunk.length, chunkNb)
     if (chunkNb === 0) {
       isBinary = isDataBinaryRobust(chunk.buffer)
     }
@@ -36,7 +36,10 @@ export default function makeStlStreamParser () {
     callback(null, Buffer.concat([positionsBuffer, normalsBuffer]))
   }
 
-  return through2(parser)
+  return through2(parser,function (cb) { // flush function
+    console.log('ee flush')
+    cb()
+  })
 }
 
 // helper function, taken from https://github.com/feross/typedarray-to-buffer
