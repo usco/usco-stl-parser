@@ -1,6 +1,4 @@
 import { isDataBinaryRobust, ensureBinary, ensureString } from './utils'
-// import through2 from 'through2'
-var through2 = require('through2')
 
 export default function makeStlStreamParser () {
   let chunkNb = 0
@@ -33,10 +31,11 @@ export default function makeStlStreamParser () {
     const positionsBuffer = toBuffer(parsed.positions)
     const normalsBuffer = toBuffer(parsed.normals)
     // console.log('positions', positionsBuffer.length, parsed.positions.length)
+    console.log('done with chunk', positionsBuffer, callback)
     callback(null, Buffer.concat([positionsBuffer, normalsBuffer]))
   }
 
-  return through2(parser)
+  return parser
 }
 
 // helper function, taken from https://github.com/feross/typedarray-to-buffer

@@ -31,7 +31,7 @@ class WorkerStream extends Duplex {
 
   end (data) {
     console.log('here')
-    this.emit('end')
+    //this.emit('end')
   }
 
   _write (chunk, encoding, callback) {
@@ -47,8 +47,8 @@ class WorkerStream extends Duplex {
 }
 
 export default function workerStreamParser () {
-  //const worker = WebWorkify(require('../workers/stlStreamWorker.js'))
-  const worker = 'src/workers/workers/stlStreamWorker.js'
+  //const worker = WebWorkify(require('../workers/stlStreamWorker2.src.js'))
+  const worker = 'src/workers/workers/stlStreamWorker2.js'
   const ws = new WorkerStream(worker)
   return ws
 }
