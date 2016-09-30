@@ -5,12 +5,12 @@ const through2 = require('through2')
 var Readable = require('stream').Readable
 
 // var worker = WebWorkify(require('./testWorker.js'))
-/*const worker = new Worker('src/workers/testWorker.js')
+const worker = new Worker('src/workers/testWorker.js')
 var workerStream = WorkerStream(worker)
 
 let dataSource = new Readable()
-dataSource.push('beep ')
-dataSource.push('boop\n')
+dataSource.push('beep')
+dataSource.push('boop')
 dataSource.push(null)
 
 const observer = function (chunk, enc, callback) {
@@ -25,32 +25,13 @@ const observer2 = function (chunk, enc, callback) {
   callback(null, textContent)
 }
 
-dataSource
+/*dataSource
   .pipe(through2(observer))
   .pipe(workerStream)
   .pipe(through2(observer2))
   .pipe(concat(function (data) {
     console.log('after workerStream', data)
-  }))
-*/
-
-var stream = require('stream')
-/*var stream = new Stream
-stream.readable = true
-
-var c = 64
-var iv = setInterval(function () {
-  if (++c >= 75) {
-    clearInterval(iv)
-    stream.emit('end')
-  }
-  else stream.emit('data', Buffer('foo') )//String.fromCharCode(c))
-}, 100)
-
-stream
-.pipe(concat(function (data) {
-  console.log('after testStream', data)
-}))*/
+  }))*/
 
 
 const Duplex = require('stream').Duplex
@@ -61,42 +42,48 @@ class WorkerStream2 extends Duplex {
     this.worker = typeof path === 'string'
       ? new Worker(path)
       : path
-    this.worker.onmessage = this.workerMessage.bind(this)
-    this.worker.onerror = this.workerError.bind(this)
-  }
 
-  workerMessage (e){
-    this.emit('data', e.data, e)
-  }
+    this.worker.onmessage = (e) => {
+      console.log('data',e)
+      //this.emit('data', e.data, e)
+      this.push(Buffer(e.data))
+    }
 
-  workerError (err) {
-    this.emit('error', err)
-  }
-
-  write (data, opts) {
-    this.worker.postMessage(data, opts)
-    return true
+    this.worker.onerror = (err) => {
+      this.emit('error', err)
+      console.log('data',err)
+    }
   }
 
   end () {
-    this.emit('end')
+    console.log('end')
+    //this.emit('end')
   }
 
   _write(chunk, encoding, callback) {
+    console.log('_write',chunk.toString('utf8'),'to worker')
+    this.worker.postMessage(chunk.buffer, [chunk.buffer])
+    callback()
   }
 
-  _read(size) {}
+  _read(size) {
+    console.log('consumer asking read', size)
+    //this.push('foo')
+  }
 }
-
 
 
 let ws =  new WorkerStream2('src/workers/testWorker.js')
 
-ws
-.pipe(concat(function (data) {
-  console.log('after testStream', data)
-}))
-ws.write( 'testSlug' )
+dataSource
+  .pipe(through2(observer))
+  .pipe(ws)
+  .pipe(through2(observer2))
+  .pipe(concat(function (data) {
+    console.log('after testStream', data)
+  }))
+
+//ws.write( 'testSlug' )
 
 /*workerStream.on('data', function(data) {
   console.log(data)

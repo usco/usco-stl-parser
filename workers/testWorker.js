@@ -1,6 +1,17 @@
-self.onmessage = function(event) {
-  console.log('event', event)
-  self.postMessage(event.data)
+function arrayBufferToString (buffer) {
+  var arr = new Uint8Array(buffer)
+  var str = String.fromCharCode.apply(String, arr)
+  if (/[\u0080-\uffff]/.test(str)) {
+    throw new Error('this string seems to contain (still encoded) multibytes')
+  }
+  return str
+}
+
+self.onmessage = function (event) {
+  // console.log('event', event)
+  const inboundMessage = arrayBufferToString(event.data) // 'utf8')
+  console.log('event', event, inboundMessage)
+  self.postMessage(inboundMessage + 'through grinder')
 }
 /*var ParentStream = require('workerstream/parent')
 const through2 = require('through2')
