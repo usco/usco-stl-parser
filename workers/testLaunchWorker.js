@@ -43,21 +43,26 @@ class WorkerStream2 extends Duplex {
       ? new Worker(path)
       : path
 
+    this.bufferedData = undefined
+    this.requestedDataSize = 0
     this.worker.onmessage = (e) => {
-      console.log('data',e)
-      //this.emit('data', e.data, e)
-      this.push(Buffer(e.data))
+      //console.log('data',e)
+      //this.push(Buffer(e.data)) //actual emits
+      const data = Buffer(e.data)
+
+      this.bufferedData = this.bufferedData ? Buffer.concat([this.bufferedData, data]) : data
+
+      if(this.requestedDataSize > 0){
+        const reqChunk = this.bufferedData.slice(0, this.requestedDataSize)
+        this.push(reqChunk)
+        this.bufferedData = this.bufferedData.slice(this.requestedDataSize)
+      }
     }
 
     this.worker.onerror = (err) => {
       this.emit('error', err)
       console.log('data',err)
     }
-  }
-
-  end () {
-    console.log('end')
-    //this.emit('end')
   }
 
   _write(chunk, encoding, callback) {
@@ -69,6 +74,7 @@ class WorkerStream2 extends Duplex {
   _read(size) {
     console.log('consumer asking read', size)
     //this.push('foo')
+    this.requestedDataSize = size
   }
 }
 

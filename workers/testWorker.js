@@ -10,7 +10,7 @@ function arrayBufferToString (buffer) {
 self.onmessage = function (event) {
   // console.log('event', event)
   const inboundMessage = arrayBufferToString(event.data) // 'utf8')
-  console.log('event', event, inboundMessage)
+  //console.log('event', event, inboundMessage)
   self.postMessage(inboundMessage + 'through grinder')
 }
 /*var ParentStream = require('workerstream/parent')
