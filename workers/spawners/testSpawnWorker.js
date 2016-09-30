@@ -4,7 +4,7 @@ const concat = require('concat-stream')
 const through2 = require('through2')
 var Readable = require('stream').Readable
 
-const worker = WebWorkify(require('./testWorker.js'))
+const worker = WebWorkify(require('../workers/testWorker.js'))
 //const worker = new Worker('src/workers/testWorker.js')
 var workerStream = WorkerStream(worker)
 
@@ -78,7 +78,7 @@ class WorkerStream2 extends Duplex {
 
 
 //const ws = new WorkerStream2('src/workers/testWorker.js')
-const _worker = WebWorkify(require('./testWorker.js'))
+const _worker = WebWorkify(require('../workers/testWorker.js'))
 const ws = new WorkerStream2(_worker)
 
 dataSource

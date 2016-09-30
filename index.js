@@ -1,12 +1,12 @@
 import fileReaderStream from 'filereader-stream'
 import readFileBasic from './readFileBasic'
-import workerSpawner from './workers/workerSpawner'
-import streamWorkerSpawner from './workers/streamWorkerSpawner'
+import workerSpawner from './workers/spawners/workerSpawner'
+import streamWorkerSpawner from './workers/spawners/streamWorkerSpawner'
 import parseStlAsStreamNoWorker from './parseStlAsStreamNoWorker'
 import parseStlAsStreamWorker from './parseStlAsStreamWorker'
 
 
-var foo = require('./workers/testLaunchWorker')
+var foo = require('./workers/spawners/testSpawnWorker')
 
 // not worker based, for dev/testing
 import { default as makeStlStreamParser } from './parsers/stl/parseStream'

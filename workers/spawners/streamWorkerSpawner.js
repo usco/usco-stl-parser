@@ -9,7 +9,7 @@ export default function streamWorkerSpawner (params, rawData) {
   let startTime
   let endTime
 
-  const worker = Workerstream('src/workers/worker2.js')
+  const worker = Workerstream('src/workers/workers/worker2.js')
 
   worker.on('data', function(data) {
     console.log(data)

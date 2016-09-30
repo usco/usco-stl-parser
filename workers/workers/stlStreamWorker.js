@@ -5609,7 +5609,7 @@ function makeStlStreamParser() {
   var previousRemainderData = void 0;
 
   var parser = function parser(chunk, enc, callback) {
-    //console.log('chunk', chunk.length, chunkNb)
+    console.log('chunk', chunk.length, chunkNb);
     if (chunkNb === 0) {
       isBinary = (0, _utils.isDataBinaryRobust)(chunk.buffer);
     }
@@ -5818,7 +5818,7 @@ function isDataBinaryRobust(data) {
 },{}],33:[function(require,module,exports){
 'use strict';
 
-var _parseStream = require('../parsers/stl/parseStream');
+var _parseStream = require('../../parsers/stl/parseStream');
 
 var _parseStream2 = _interopRequireDefault(_parseStream);
 
@@ -5834,4 +5834,4 @@ module.exports = function () {
   parentStream.pipe(stlStreamParser).pipe(parentStream);
 };
 
-},{"../parsers/stl/parseStream":31,"workerstream/parent":29}]},{},[33]);
+},{"../../parsers/stl/parseStream":31,"workerstream/parent":29}]},{},[33]);

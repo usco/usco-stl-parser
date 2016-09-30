@@ -47,8 +47,8 @@ class WorkerStream extends Duplex {
 }
 
 export default function workerStreamParser () {
-  //const worker = WebWorkify(require('./stlStreamWorker.js'))
-  const worker = 'src/workers/stlStreamWorker.js'
+  //const worker = WebWorkify(require('../workers/stlStreamWorker.js'))
+  const worker = 'src/workers/workers/stlStreamWorker.js'
   const ws = new WorkerStream(worker)
   return ws
 }

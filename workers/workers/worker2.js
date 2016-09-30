@@ -21,6 +21,8 @@ function parseSteps(data) {
     result = parseASCII((0, _utils.ensureString)(data));
   }
   return result;
+
+  //  return isBinary ? parseBinary(data) : parseASCII(ensureString(data))
 }
 
 function parseBinary(data) {
@@ -101,10 +103,11 @@ Object.defineProperty(exports, "__esModule", {
 exports.ensureString = ensureString;
 exports.ensureBinary = ensureBinary;
 exports.isDataBinary = isDataBinary;
+exports.isDataBinaryRobust = isDataBinaryRobust;
 function ensureString(buf) {
-  console.log('ensureString');
+  //console.log('ensureString')
   if (typeof buf !== 'string') {
-    console.log('forcing string', buf);
+    //console.log('forcing string', buf)
     var array_buffer = new Uint8Array(buf);
     var str = '';
     for (var i = 0; i < buf.byteLength; i++) {
@@ -112,28 +115,28 @@ function ensureString(buf) {
     }
     return str;
   } else {
-    console.log('already string');
+    //console.log('already string')
     return buf;
   }
 }
 
 function ensureBinary(buf) {
-  console.log('ensureBinary');
+  //console.log('ensureBinary')
   if (typeof buf === 'string') {
-    console.log('forcing binary');
+    //console.log('forcing binary')
     var array_buffer = new Uint8Array(buf.length);
     for (var i = 0; i < buf.length; i++) {
       array_buffer[i] = buf.charCodeAt(i) & 0xff; // implicitly assumes little-endian
     }
     return array_buffer.buffer || array_buffer;
   } else {
-    console.log('already binary');
+    //console.log('already binary')
     return buf;
   }
 }
 
 function isDataBinary(data) {
-  console.log('data', data);
+  console.log('data is binary ?');
   var expect, face_size, n_faces, reader;
   reader = new DataView(data);
   face_size = 32 / 8 * 3 + 32 / 8 * 3 * 3 + 16 / 8;
@@ -143,10 +146,19 @@ function isDataBinary(data) {
   return expect === reader.byteLength;
 }
 
+//a more robust version of the above, that does NOT require the whole file
+function isDataBinaryRobust(data) {
+  //console.log('data is binary ?')
+  var patternVertex = /vertex[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g;
+  var text = ensureString(data);
+  var isBinary = patternVertex.exec(text) === null;
+  return isBinary;
+}
+
 },{}],3:[function(require,module,exports){
 'use strict';
 
-var _parseHelpers = require('../parsers/stl/parseHelpers.js');
+var _parseHelpers = require('../../parsers/stl/parseHelpers.js');
 
 var _parseHelpers2 = _interopRequireDefault(_parseHelpers);
 
@@ -154,7 +166,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 self.onmessage = function (event) {
   //console.log('event',event.data)
-  var result = (0, _parseHelpers2.default)(event.data);
+  var result = (0, _parseHelpers2.default)(event.data.buffer);
 
   var positions = result.positions.buffer;
   var normals = result.normals.buffer;
@@ -166,11 +178,6 @@ self.onmessage = function (event) {
   if ('close' in self) {
     self.close();
   }
-}; /*function parseSteps (data) {
-     return {
-       positions: new ArrayBuffer(1),//data.size), //[0, 1, 2],
-       normals: new ArrayBuffer(2)//data.size),//[2, 1, 0]
-     }
-   }*/
+};
 
-},{"../parsers/stl/parseHelpers.js":1}]},{},[3]);
+},{"../../parsers/stl/parseHelpers.js":1}]},{},[3]);

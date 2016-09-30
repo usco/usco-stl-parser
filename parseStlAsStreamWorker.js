@@ -3,7 +3,7 @@ const concat = require('concat-stream')
 const Writable = require('stream').Writable
 import { default as makeStlStreamParser } from './parsers/stl/parseStream'
 
-import workerStreamParser from './workers/streamWorkerSpawner2'
+import workerStreamParser from './workers/spawners/streamWorkerSpawner2'
 
 export default function parseStlAsStreamWorker (fileReaderStream, files) {
   let startTime
