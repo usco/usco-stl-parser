@@ -11,8 +11,8 @@ class WorkerStream extends Duplex {
 
     this.worker.onmessage = (e) => {
       const data = Buffer(e.data)
-
-      this.bufferedData = this.bufferedData ? Buffer.concat([this.bufferedData, data]) : data
+      this.push(data)
+      /*this.bufferedData = this.bufferedData ? Buffer.concat([this.bufferedData, data]) : data
 
       if (this.requestedDataQueue.length > 0) {
         const size = this.requestedDataQueue[0]
@@ -21,7 +21,7 @@ class WorkerStream extends Duplex {
 
         this.bufferedData = this.bufferedData.slice(size)
         this.requestedDataQueue.shift()
-      }
+      }*/
     }
 
     this.worker.onerror = (err) => {
@@ -30,6 +30,7 @@ class WorkerStream extends Duplex {
   }
 
   end (data) {
+    console.log('here')
     this.emit('end')
   }
 
@@ -46,7 +47,8 @@ class WorkerStream extends Duplex {
 }
 
 export default function workerStreamParser () {
-  const worker = WebWorkify(require('./stlStreamWorker.js'))
+  //const worker = WebWorkify(require('./stlStreamWorker.js'))
+  const worker = 'src/workers/stlStreamWorker.js'
   const ws = new WorkerStream(worker)
   return ws
 }

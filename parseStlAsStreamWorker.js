@@ -30,9 +30,9 @@ export default function parseStlAsStreamWorker (fileReaderStream, files) {
   startTime = new Date()
 
   let pipeline = fileStream
-    .pipe(through2(before))
+    //.pipe(through2(before))
     .pipe(wokerStreamer)
-    .pipe(through2(after))
+    //.pipe(through2(after))
     .pipe(concat(function (data) {
       console.log('FUUUUend of data',data)
       accPositions = data.slice(0, data.length / 2)
