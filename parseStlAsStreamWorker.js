@@ -13,7 +13,7 @@ export default function parseStlAsStreamWorker (fileReaderStream, files) {
   let accPositions
   let accNormals
 
-  const chunkSize = 1024 // 1100
+  const chunkSize = 512 // 1100
 
   function before(chunk, enc, callback) {
     console.log('here before worker', chunk)
@@ -34,7 +34,7 @@ export default function parseStlAsStreamWorker (fileReaderStream, files) {
     .pipe(wokerStreamer)
     //.pipe(through2(after))
     .pipe(concat(function (data) {
-      console.log('FUUUUend of data',data)
+      //console.log('FUUUUend of data',data)
       accPositions = data.slice(0, data.length / 2)
       accNormals = data.slice(data.length / 2)
 

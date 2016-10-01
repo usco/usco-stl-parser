@@ -136,7 +136,7 @@ function ensureBinary(buf) {
 }
 
 function isDataBinary(data) {
-  console.log('data is binary ?');
+  //console.log('data is binary ?')
   var expect, face_size, n_faces, reader;
   reader = new DataView(data);
   face_size = 32 / 8 * 3 + 32 / 8 * 3 * 3 + 16 / 8;

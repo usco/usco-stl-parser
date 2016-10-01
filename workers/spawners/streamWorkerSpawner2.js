@@ -5,13 +5,12 @@ class WorkerStream extends Duplex {
   constructor (path) {
     super()
     this.worker = typeof path === 'string' ? new Worker(path) : path
-
+    this.requests = 0
     this.bufferedData = undefined
     this.requestedDataQueue = []
 
     this.worker.onmessage = (e) => {
       const data = Buffer(e.data)
-      this.push(data)
       /*this.bufferedData = this.bufferedData ? Buffer.concat([this.bufferedData, data]) : data
 
       if (this.requestedDataQueue.length > 0) {
@@ -21,7 +20,19 @@ class WorkerStream extends Duplex {
 
         this.bufferedData = this.bufferedData.slice(size)
         this.requestedDataQueue.shift()
+
+        this.requests -= 1
+        console.log('requests',this.requests)
+
+      }
+      if(this.requests === 0 && this.bufferedData.length === 0) {
+        this.emit('end')
       }*/
+      this.push(data)
+      this.requests -= 1
+      if (this.requests === 0) {
+        this.emit('end')
+      }
     }
 
     this.worker.onerror = (err) => {
@@ -31,13 +42,14 @@ class WorkerStream extends Duplex {
 
   end (data) {
     console.log('here')
-    //this.emit('end')
+  // this.emit('end')
   }
 
   _write (chunk, encoding, callback) {
     // console.log('_write',chunk.toString('utf8'),'to worker')
     this.worker.postMessage(chunk.buffer, [chunk.buffer])
-    callback()
+    this.requests += 1
+    callback(null, chunk)
   }
 
   _read (size) {
@@ -47,7 +59,7 @@ class WorkerStream extends Duplex {
 }
 
 export default function workerStreamParser () {
-  //const worker = WebWorkify(require('../workers/stlStreamWorker2.src.js'))
+  // const worker = WebWorkify(require('../workers/stlStreamWorker2.src.js'))
   const worker = 'src/workers/workers/stlStreamWorker2.js'
   const ws = new WorkerStream(worker)
   return ws

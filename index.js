@@ -58,11 +58,11 @@ function handleFileSelect (e) {
 
   }
 
-  //repeat(testCount, testRunTransferable, files[0])
-  //repeat(testCount, testRunCopy, files[0])
+  repeat(testCount, testRunTransferable, files[0])
+  repeat(testCount, testRunCopy, files[0])
   //repeat(testCount, testRunStreamBlock, files[0])
 
-  //parseStlAsStreamNoWorker(fileReaderStream, files)
+  parseStlAsStreamNoWorker(fileReaderStream, files)
   parseStlAsStreamWorker(fileReaderStream, files)
 }
 

@@ -2016,7 +2016,7 @@ function makeStlStreamParser() {
   var previousRemainderData = void 0;
 
   var parser = function parser(chunk, enc, callback) {
-    console.log('chunk', chunk.length, chunkNb);
+    //console.log('chunk', chunk.length, chunkNb)
     if (chunkNb === 0) {
       isBinary = (0, _utils.isDataBinaryRobust)(chunk.buffer);
     }
@@ -2042,7 +2042,7 @@ function makeStlStreamParser() {
     var positionsBuffer = toBuffer(parsed.positions);
     var normalsBuffer = toBuffer(parsed.normals);
     // console.log('positions', positionsBuffer.length, parsed.positions.length)
-    console.log('done with chunk', positionsBuffer, callback);
+    //console.log('done with chunk', positionsBuffer, callback)
     callback(null, Buffer.concat([positionsBuffer, normalsBuffer]));
   };
 
@@ -2200,7 +2200,7 @@ function ensureBinary(buf) {
 }
 
 function isDataBinary(data) {
-  console.log('data is binary ?');
+  //console.log('data is binary ?')
   var expect, face_size, n_faces, reader;
   reader = new DataView(data);
   face_size = 32 / 8 * 3 + 32 / 8 * 3 * 3 + 16 / 8;
@@ -2232,11 +2232,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var stlStreamParser = (0, _parseStreamAlt2.default)();
 
 self.onmessage = function (event) {
-  var _this = self;
-  function callback(err, data) {
-    self.postMessage(data.buffer, [data.buffer]);
-  }
-  console.log('event', Buffer(event.data));
   stlStreamParser(Buffer(event.data), null, function (err, data) {
     return self.postMessage(data.buffer, [data.buffer]);
   });

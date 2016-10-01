@@ -11,7 +11,7 @@ export default function makeStlStreamParser () {
   let previousRemainderData
 
   const parser = function (chunk, enc, callback) {
-    console.log('chunk', chunk.length, chunkNb)
+    //console.log('chunk', chunk.length, chunkNb)
     if (chunkNb === 0) {
       isBinary = isDataBinaryRobust(chunk.buffer)
     }
