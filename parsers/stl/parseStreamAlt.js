@@ -13,7 +13,7 @@ export default function makeStlStreamParser () {
     if (chunkNb === 0) {
       isBinary = isDataBinaryRobust(chunk.buffer)
     }
-    const workChunk = ensureBinary(previousRemainderData ? Buffer.concat([previousRemainderData, chunk]) : chunk)
+    const workChunk = ensureBinary(previousRemainderData ? Buffer.concat([previousRemainderData, chunk], previousRemainderData.length + chunk.length) : chunk)
 
     const {remainingDataInChunk, startOffset} = isBinary ? computeBinaryOffset(workChunk, chunkNb) : computASCIIOffset(workChunk, chunkNb)
 
@@ -32,7 +32,7 @@ export default function makeStlStreamParser () {
     const normalsBuffer = toBuffer(parsed.normals)
     // console.log('positions', positionsBuffer.length, parsed.positions.length)
     //console.log('done with chunk', positionsBuffer, callback)
-    callback(null, Buffer.concat([positionsBuffer, normalsBuffer]))
+    callback(null, Buffer.concat([positionsBuffer, normalsBuffer], positionsBuffer.length + normalsBuffer.length))
   }
 
   return parser
@@ -70,6 +70,8 @@ function parseBinaryChunk (faceOffset, remainingDataInChunk, startOffset, workCh
   const faces = reader.getUint32(80, true)
   let positions = new Float32Array(facesInChunk * 3 * 3)
   let normals = new Float32Array(facesInChunk * 3 * 3)
+
+  let data = new Float32Array(facesInChunk * 2 * 3 * 3)//we want one big typedArray for all the data , to avoid concat operations
 
   let lface = 0
   let offset = 0
