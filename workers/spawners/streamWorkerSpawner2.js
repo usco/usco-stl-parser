@@ -5,12 +5,17 @@ class WorkerStream extends Duplex {
   constructor (path) {
     super()
     this.worker = typeof path === 'string' ? new Worker(path) : path
+
     this.requests = 0
+    this.responses = 0
+    this.doneWriting = false
+
     this.bufferedData = undefined
     this.requestedDataQueue = []
 
     this.worker.onmessage = (e) => {
       const data = Buffer(e.data)
+      //console.log('recieved', this.requests)
       /*this.bufferedData = this.bufferedData ? Buffer.concat([this.bufferedData, data]) : data
 
       if (this.requestedDataQueue.length > 0) {
@@ -29,10 +34,8 @@ class WorkerStream extends Duplex {
         this.emit('end')
       }*/
       this.push(data)
-      this.requests -= 1
-      if (this.requests === 0) {
-        this.emit('end')
-      }
+      this.responses += 1
+      this._done()
     }
 
     this.worker.onerror = (err) => {
@@ -40,21 +43,30 @@ class WorkerStream extends Duplex {
     }
   }
 
+  _done () {
+    if (this.requests === this.responses && this.doneWriting) {
+      //console.log('done FOR REALZ')
+      this.emit('end')
+    }
+  }
+
   end (data) {
-    console.log('here')
-  // this.emit('end')
+    this.doneWriting = true
+    //console.log('done writing', this.requests, this.responses)
+    this._done()
   }
 
   _write (chunk, encoding, callback) {
     // console.log('_write',chunk.toString('utf8'),'to worker')
+    this.requests +=1
     this.worker.postMessage(chunk.buffer, [chunk.buffer])
-    this.requests += 1
+
     callback(null, chunk)
   }
 
   _read (size) {
     // console.log('consumer asking read', size)
-    this.requestedDataQueue.push(size)
+    //this.requestedDataQueue.push(size)
   }
 }
 
