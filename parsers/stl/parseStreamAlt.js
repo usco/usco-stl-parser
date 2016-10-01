@@ -9,7 +9,7 @@ export default function makeStlStreamParser () {
   let previousRemainderData
 
   const parser = function (chunk, enc, callback) {
-    console.log('chunk', chunk.length, chunkNb)
+    //console.log('chunk', chunk.length, chunkNb)
     if (chunkNb === 0) {
       isBinary = isDataBinaryRobust(chunk.buffer)
     }
@@ -31,7 +31,7 @@ export default function makeStlStreamParser () {
     const positionsBuffer = toBuffer(parsed.positions)
     const normalsBuffer = toBuffer(parsed.normals)
     // console.log('positions', positionsBuffer.length, parsed.positions.length)
-    console.log('done with chunk', positionsBuffer, callback)
+    //console.log('done with chunk', positionsBuffer, callback)
     callback(null, Buffer.concat([positionsBuffer, normalsBuffer]))
   }
 
