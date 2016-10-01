@@ -6,14 +6,14 @@ export default function workerSpawner (params, rawData) {
   let endTime
 
   worker.onmessage = function (event) {
-    console.log('recieved data from worker', event.data)
+    //console.log('recieved data from worker', event.data)
     //console.log('on message', event.data)
     //console.log('data size', event.data.positions.byteLength)
     // const positions = new Float32Array(event.data.positions)
     // const normals = new Float32Array(event.data.normals)
     endTime = new Date()
 
-    console.log(`Mode: ${mode},  elapsed: `, endTime - startTime)
+    console.log(`Mode: ${mode},  elapsed: ${endTime - startTime}, geometry size: ${event.data.positions.byteLength}`)
   }
 
   worker.onerror = function (event) {
@@ -27,10 +27,10 @@ export default function workerSpawner (params, rawData) {
   startTime = new Date()
 
   if (transferable) {
-    console.log('sending data to worker in transferable mode')
+    //console.log('sending data to worker in transferable mode')
     worker.postMessage(data, [data])
   } else {
-    console.log('sending data to worker in copy mode')
+    //console.log('sending data to worker in copy mode')
     worker.postMessage(data)
   }
 }

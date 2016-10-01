@@ -50,8 +50,8 @@ export default function parseStlAsStreamWorker (fileReaderStream, files) {
       positions: accPositions,
       normals: accNormals
     }
-    console.log('done', accData)
+    //console.log('done', accData)
     endTime = new Date()
-    console.log(`Mode: streaming, worker,  elapsed: `, endTime - startTime)
+    console.log(`Mode: streaming, worker, chunkSize: ${chunkSize}kb, elapsed: ${endTime - startTime}, geometry size: ${accData.positions.byteLength}`)
   })
 }

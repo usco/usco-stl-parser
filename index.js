@@ -6,7 +6,7 @@ import parseStlAsStreamNoWorker from './parseStlAsStreamNoWorker'
 import parseStlAsStreamWorker from './parseStlAsStreamWorker'
 
 
-var foo = require('./workers/spawners/testSpawnWorker')
+//var foo = require('./workers/spawners/testSpawnWorker')
 
 // not worker based, for dev/testing
 import { default as makeStlStreamParser } from './parsers/stl/parseStream'
@@ -59,10 +59,10 @@ function handleFileSelect (e) {
   }
 
   repeat(testCount, testRunTransferable, files[0])
-  repeat(testCount, testRunCopy, files[0])
+  //repeat(testCount, testRunCopy, files[0])
   //repeat(testCount, testRunStreamBlock, files[0])
 
-  parseStlAsStreamNoWorker(fileReaderStream, files)
+  //parseStlAsStreamNoWorker(fileReaderStream, files)
   parseStlAsStreamWorker(fileReaderStream, files)
 }
 
