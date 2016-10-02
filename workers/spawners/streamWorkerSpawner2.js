@@ -13,26 +13,13 @@ class WorkerStream extends Duplex {
     this.bufferedData = undefined
     this.requestedDataQueue = []
 
+    this.requestedTotal = 0
+    this.sentTotal = 0
+
     this.worker.onmessage = (e) => {
+      //this._dealWithData(e)
+
       const data = Buffer(e.data)
-      //console.log('recieved', this.requests)
-      /*this.bufferedData = this.bufferedData ? Buffer.concat([this.bufferedData, data]) : data
-
-      if (this.requestedDataQueue.length > 0) {
-        const size = this.requestedDataQueue[0]
-        const reqChunk = this.bufferedData.slice(0, size)
-        this.push(reqChunk) // actual emits requested chunk size
-
-        this.bufferedData = this.bufferedData.slice(size)
-        this.requestedDataQueue.shift()
-
-        this.requests -= 1
-        console.log('requests',this.requests)
-
-      }
-      if(this.requests === 0 && this.bufferedData.length === 0) {
-        this.emit('end')
-      }*/
       this.push(data)
       this.responses += 1
       this._done()
@@ -43,8 +30,33 @@ class WorkerStream extends Duplex {
     }
   }
 
+  _dealWithData (e) {
+    if(e){
+      const data = Buffer(e.data)
+      //console.log('recieved', this.requests)
+      this.bufferedData = this.bufferedData ? Buffer.concat([this.bufferedData, data]) : data
+    }
+
+
+    if (this.bufferedData && this.requestedDataQueue.length > 0) {
+      const size = this.requestedDataQueue[0]
+      const reqChunk = this.bufferedData.slice(0, size)
+      this.push(reqChunk) // actual emits requested chunk size
+
+      this.bufferedData = this.bufferedData.slice(size)
+      this.sentTotal += reqChunk.length
+      console.log('sentTotal', this.sentTotal)
+      this.requestedDataQueue.shift()
+      //console.log(this.requestedDataQueue.length)
+      //this.responses += 1
+    }
+    this._done()
+  }
+
   _done () {
-    if (this.requests === this.responses && this.doneWriting) {
+    //if (this.requestedDataQueue.length === 0 && this.doneWriting)
+    if(this.requests === this.responses && this.doneWriting)
+    {  //
       //console.log('done FOR REALZ')
       this.emit('end')
     }
@@ -66,7 +78,11 @@ class WorkerStream extends Duplex {
 
   _read (size) {
     // console.log('consumer asking read', size)
-    //this.requestedDataQueue.push(size)
+    this.requestedDataQueue.push(size)
+    this.requestedTotal += size
+    //console.log('requestedTotal',this.requestedTotal)
+
+    //this._dealWithData()
   }
 }
 
