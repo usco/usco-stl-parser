@@ -38,8 +38,8 @@ export default function parseStlAsStreamWorker (fileReaderStream, files) {
       accPositions = data.slice(0, data.length / 2)
       accNormals = data.slice(data.length / 2)
 
-      accPositions = accPositions.buffer.slice(accPositions.byteOffset, accPositions.byteOffset + accPositions.byteLength)
-      accNormals = accNormals.buffer.slice(accNormals.byteOffset, accNormals.byteOffset + accNormals.byteLength)
+      accPositions = new Float32Array(accPositions.buffer.slice(accPositions.byteOffset, accPositions.byteOffset + accPositions.byteLength)) //
+      accNormals = new Float32Array(accNormals.buffer.slice(accNormals.byteOffset, accNormals.byteOffset + accNormals.byteLength))
 
       // accPositions = new Float32Array(accPositions.buffer, accPositions.byteOffset, accPositions.byteLength / Float32Array.BYTES_PER_ELEMENT)
       // accNormals = new Float32Array(accNormals.buffer, accNormals.byteOffset, accNormals.byteLength / Float32Array.BYTES_PER_ELEMENT)
@@ -50,6 +50,8 @@ export default function parseStlAsStreamWorker (fileReaderStream, files) {
       positions: accPositions,
       normals: accNormals
     }
+    //console.log('first', accPositions[0], 'last item in positions', accPositions[accPositions.length-1])
+
     //console.log('done', accData)
     endTime = new Date()
     console.log(`Mode: streaming, worker, chunkSize: ${chunkSize}kb, elapsed: ${endTime - startTime}, geometry size: ${accData.positions.byteLength}`)
