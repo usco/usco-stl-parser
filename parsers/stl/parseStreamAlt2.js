@@ -19,7 +19,7 @@ export default function makeStlStreamParser () {
       workChunk.set(new Uint8Array(previousRemainderData))
       workChunk.set(new Uint8Array(chunk), previousRemainderData.byteLength)
       workChunk = workChunk.buffer
-      let data = ensureString(workChunk)
+      //let data = ensureString(workChunk)
     } else {
       workChunk = chunk
     }
@@ -151,7 +151,7 @@ export function parseASCIIChunk (workChunk) {
   normals.set(normArray)*/
   let outData = new Float32Array(faces * 3 * 3 * 2)
   outData.set(posArray)
-  outData.set(normArray, posArray.length)
+  outData.set(normArray, posArray.byteLength)
 
   // compute offsets, remainderData etc for next chunk etc
   const remainderTextData = data.slice(offset)
