@@ -2020,7 +2020,7 @@ function makeStlStreamParser() {
     if (chunkNb === 0) {
       isBinary = (0, _utils.isDataBinaryRobust)(chunk.buffer);
     }
-    var workChunk = (0, _utils.ensureBinary)(previousRemainderData ? Buffer.concat([previousRemainderData, chunk]) : chunk);
+    var workChunk = (0, _utils.ensureBinary)(previousRemainderData ? Buffer.concat([previousRemainderData, chunk], previousRemainderData.length + chunk.length) : chunk);
 
     var _ref = isBinary ? computeBinaryOffset(workChunk, chunkNb) : computASCIIOffset(workChunk, chunkNb);
 
@@ -2043,7 +2043,7 @@ function makeStlStreamParser() {
     var normalsBuffer = toBuffer(parsed.normals);
     // console.log('positions', positionsBuffer.length, parsed.positions.length)
     //console.log('done with chunk', positionsBuffer, callback)
-    callback(null, Buffer.concat([positionsBuffer, normalsBuffer]));
+    callback(null, Buffer.concat([positionsBuffer, normalsBuffer], positionsBuffer.length + normalsBuffer.length));
   };
 
   return parser;
@@ -2081,6 +2081,8 @@ function parseBinaryChunk(faceOffset, remainingDataInChunk, startOffset, workChu
   var faces = reader.getUint32(80, true);
   var positions = new Float32Array(facesInChunk * 3 * 3);
   var normals = new Float32Array(facesInChunk * 3 * 3);
+
+  var data = new Float32Array(facesInChunk * 2 * 3 * 3); //we want one big typedArray for all the data , to avoid concat operations
 
   var lface = 0;
   var offset = 0;
@@ -2232,6 +2234,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var stlStreamParser = (0, _parseStreamAlt2.default)();
 
 self.onmessage = function (event) {
+  //stlStreamParser(event.data, null, (err, data) => self.postMessage(data.buffer, [data.buffer]))
   stlStreamParser(Buffer(event.data), null, function (err, data) {
     return self.postMessage(data.buffer, [data.buffer]);
   });
