@@ -1,5 +1,6 @@
 const Duplex = require('stream').Duplex
 
+/* utility to wrap a web worker and turn it into a stream*/
 export default class WorkerStream extends Duplex {
   constructor (path) {
     super()

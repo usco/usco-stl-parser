@@ -1,6 +1,6 @@
-import { isDataBinaryRobust, ensureBinary, ensureString } from './utils'
+import { isDataBinaryRobust, ensureString } from './utils'
 
-export default function makeStlStreamParser () {
+export default function makeStreamParser () {
   let chunkNb = 0
   let isBinary = false
 

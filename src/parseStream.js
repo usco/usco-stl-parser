@@ -1,13 +1,12 @@
 import { isDataBinaryRobust, ensureBinary, ensureString } from './utils'
 
-export default function makeStlStreamParser () {
+export default function makeStreamParser () {
   let chunkNb = 0
   let totalSize = 0
   let isBinary = false
 
   let faceOffset = 0
   let previousRemainderData
-
   const parser = function (chunk, enc, callback) {
     //console.log('chunk', chunk.length, chunkNb)
     if (chunkNb === 0) {
@@ -18,7 +17,7 @@ export default function makeStlStreamParser () {
     const {remainingDataInChunk, startOffset} = isBinary ? computeBinaryOffset(workChunk, chunkNb) : computASCIIOffset(workChunk, chunkNb)
 
     const parsed = isBinary ? parseBinaryChunk(faceOffset, remainingDataInChunk, startOffset, workChunk) : parseASCIIChunk(workChunk)
-    // console.log('faceOffset', faceOffset, 'facesInChunk', facesInChunk, 'remainderDataLength', remainderDataLength, 'current face ', face)
+    //console.log('faceOffset', faceOffset, 'facesInChunk', facesInChunk, 'remainderDataLength', remainderDataLength, 'current face ', face)
 
     // update size
     chunkNb += 1
