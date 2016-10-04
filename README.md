@@ -1,37 +1,46 @@
-## Usco-stl-parser
+## Usco-stl-parser: stl format parser
 
 [![GitHub version](https://badge.fury.io/gh/usco%2Fusco-stl-parser.svg)](https://badge.fury.io/gh/usco%2Fusco-stl-parser)
 
-stl format parser for USCO project
+Optimized for speed in the browser (webworkers etc), and low memory consumption (using node.js streams)
 
-originally based on THREE.js STL parser, but rather extensively modified.
-(not dependenant, or using three.js anymore)
-
-Optimized for speed in the browser (webworkers etc)
-
+Disclaimer: was based a long long time ago on the Three.js STL parser, but has little left of the original code
 
 
 ## General information
 
-  - returns raw buffer data wrapped in an RxJs observable (soon to be most.js)
-  - useable both on Node.js & client side 
+  - returns a node.js stream containing geometric (positions & normals) data in TypedArrays (Float32Array)
+  - useable both on Node.js & client side
+
+## Usage
 
 
-## Usage 
-
-  
-          import parse,  {outputs} from '../lib/stl-parser'
-
-          let data = fs.readFileSync("mesh.stl",'binary')
-
-          let stlObs = parse(data) //we get an observable back
-
-          stlObs.forEach(function(parsedSTL){
-            //DO what you want with the data wich is something like {vertices,normals,etc}
-            console.log(parsedSTL) 
-          })
+  import makeStlStream from 'usco-stl-parser'
+  import concat from 'concat-stream' // just for demo purposes, helps to get the whole result data
 
 
+  fs.createReadStream('./PATH/TO/mesh.stl')//get a readstream of our raw data
+    .pipe(makeStlStream())// here is the magic
+    .pipe(concat(function (data) {
+      //Data is packed half/half for positions and normals
+      let positions = data.slice(0, data.length / 2)
+      let normals = data.slice(data.length / 2)
+
+      positions = new Float32Array(positions.buffer.slice(positions.byteOffset, positions.byteOffset + positions.byteLength)) //
+      normals = new Float32Array(normals.buffer.slice(normals.byteOffset, normals.byteOffset + normals.byteLength))
+      const parsedSTL = {
+        positions: positions,
+        normals: normals
+      }
+
+      //DO what you want with the data wich is something like {vertices,normals,etc}
+      console.log(parsedSTL)
+    }})
+
+
+## TODO
+
+  - [ ] add support for backpressure (work in progress)
 
 ## LICENSE
 
