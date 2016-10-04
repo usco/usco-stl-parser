@@ -9,15 +9,11 @@
   "main": "lib/server/index.js",
   "browser": "lib/browser/stl-parser.js",
   "dependencies": {
-    "@most/create": "^1.1.3",
     "composite-detect": "0.0.3",
-    "concat-stream": "^1.5.2",
-    "fast.js": "^0.1.1",
-    "most": "^1.0.1",
-    "through2": "^2.0.1",
-    "workerjs": "^0.1.1"
+    "through2": "^2.0.1"
   },
   "devDependencies": {
+    "concat-stream": "^1.5.2",
     "assert": "^1.3.0",
     "ava": "^0.16.0",
     "babel-cli": "^6.6.5",
