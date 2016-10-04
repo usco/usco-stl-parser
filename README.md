@@ -15,27 +15,27 @@ Disclaimer: was based a long long time ago on the Three.js STL parser, but has l
 ## Usage
 
 
-  import makeStlStream from 'usco-stl-parser'
-  import concat from 'concat-stream' // just for demo purposes, helps to get the whole result data
+    import makeStlStream from 'usco-stl-parser'
+    import concat from 'concat-stream' // just for demo purposes, helps to get the whole result data
 
 
-  fs.createReadStream('./PATH/TO/mesh.stl')//get a readstream of our raw data
-    .pipe(makeStlStream())// here is the magic
-    .pipe(concat(function (data) {
-      //Data is packed half/half for positions and normals
-      let positions = data.slice(0, data.length / 2)
-      let normals = data.slice(data.length / 2)
+    fs.createReadStream('./PATH/TO/mesh.stl')//get a readstream of our raw data
+      .pipe(makeStlStream())// here is the magic
+      .pipe(concat(function (data) {
+        //Data is packed half/half for positions and normals
+        let positions = data.slice(0, data.length / 2)
+        let normals = data.slice(data.length / 2)
 
-      positions = new Float32Array(positions.buffer.slice(positions.byteOffset, positions.byteOffset + positions.byteLength)) //
-      normals = new Float32Array(normals.buffer.slice(normals.byteOffset, normals.byteOffset + normals.byteLength))
-      const parsedSTL = {
-        positions: positions,
-        normals: normals
-      }
+        positions = new Float32Array(positions.buffer.slice(positions.byteOffset, positions.byteOffset + positions.byteLength)) //
+        normals = new Float32Array(normals.buffer.slice(normals.byteOffset, normals.byteOffset + normals.byteLength))
+        const parsedSTL = {
+          positions: positions,
+          normals: normals
+        }
 
-      //DO what you want with the data wich is something like {vertices,normals,etc}
-      console.log(parsedSTL)
-    }})
+        //DO what you want with the data wich is something like {vertices,normals,etc}
+        console.log(parsedSTL)
+      }})
 
 
 ## TODO
