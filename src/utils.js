@@ -40,11 +40,11 @@ export function isDataBinary (data) {
   return expect === reader.byteLength
 }
 
-//a more robust version of the above, that does NOT require the whole file
+// a more robust version of the above, that does NOT require the whole file
 export function isDataBinaryRobust (data) {
-  //console.log('data is binary ?')
+  // console.log('data is binary ?')
   const patternVertex = /vertex[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g
-  const text =  ensureString(data)
+  const text = ensureString(data)
   const isBinary = patternVertex.exec(text) === null
   return isBinary
 }
