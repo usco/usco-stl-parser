@@ -11,8 +11,10 @@
   "dependencies": {
     "@most/create": "^1.1.3",
     "composite-detect": "0.0.3",
+    "concat-stream": "^1.5.2",
     "fast.js": "^0.1.1",
     "most": "^1.0.1",
+    "through2": "^2.0.1",
     "workerjs": "^0.1.1"
   },
   "devDependencies": {
@@ -23,13 +25,14 @@
     "babel-preset-es2015": "^6.1.18",
     "babelify": "^7.2.0",
     "brfs": "^1.4.1",
-    "browserify": "^12.0.1",
+    "browserify": "^13.0.0",
     "browserify-shim": "^3.8.11",
     "browserify-test": "^2.1.2",
     "workerify": "^0.3.0"
   },
   "scripts": {
     "browserify": "browserify src/index.js -t babelify -t workerify -t browserify-shim --standalone stl-parser --exclude rx --outfile lib/browser/stl-parser.js",
+    "browserify-worker": "NODE_ENV=production && browserify src/stlStreamWorker.src.js -t babelify -t workerify -t --outfile src/stlStreamWorker.js",
     "test": "ava './test/**/*.spec.js' --require babel-register --verbose",
     "build-brs": "npm run browserify",
     "build-srv": "babel -d lib/server src/",
