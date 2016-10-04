@@ -1,5 +1,10 @@
 import { isDataBinaryRobust, ensureString } from './utils'
 
+/*
+this version of the parser tries to get rid of the dependency on node.js Buffer
+- works for binary files
+- for some reason fails with ASCII files, very likely due to how data is cut and reassembled
+*/
 export default function makeStreamParser () {
   let chunkNb = 0
   let isBinary = false

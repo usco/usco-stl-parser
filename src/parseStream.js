@@ -59,6 +59,7 @@ function computASCIIOffset (workChunk, chunkNb) {
   return {remainingDataInChunk: workChunk.length, startOffset: 0}
 }
 
+//handle parsing of a single binary chunk
 function parseBinaryChunk (faceOffset, remainingDataInChunk, startOffset, workChunk) {
   // console.log('faces', faces, 'chunk size', chunk.length, 'workChunk', workChunk.length)
   // process all faces data that we can
