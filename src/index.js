@@ -1,155 +1,88 @@
-/**
- * @author aleeper / http://adamleeper.com/
- * @author mrdoob / http://mrdoob.com/
- * @author gero3 / https://github.com/gero3
- * @author kaosat-dev / https://github.com/kaosat-dev
- *
- * Description: A parser for STL ASCII files & BINARY, as created by Solidworks and other CAD programs.
- *
- * Supports both binary and ASCII encoded files, with automatic detection of type.
- *
- * Limitations:
- *  Binary decoding ignores header. There doesn't seem to be much of a use for it.
- *  There is perhaps some question as to how valid it is to always assume little-endian-ness.
- *  ASCII decoding assumes file is UTF-8. Seems to work for the examples...
- *
- * Usage:
- *  var parser = new STLParser()
- *  var loader = new THREE.XHRLoader( parser )
- *  loader.addEventListener( 'load', function ( event ) {
- *
- *    var geometry = event.content
- *    scene.add( new THREE.Mesh( geometry ) )
- *
- *  } )
- *  loader.load( './models/stl/slotted_disk.stl' )
- */
+import fileReaderStream from 'filereader-stream'
+import readFileBasic from './readFileBasic'
+import workerSpawner from './workers/spawners/workerSpawner'
+import streamWorkerSpawner from './workers/spawners/streamWorkerSpawner'
+import parseStlAsStreamNoWorker from './parseStlAsStreamNoWorker'
+import parseStlAsStreamWorker from './parseStlAsStreamWorker'
 
-/*er = Rx.DOM.fromWebWorker('worker.js');
+// var foo = require('./workers/spawners/testSpawnWorker')
 
-worker.subscribe(function (e) {
-    console.log(e.data);
-});
-
-worker.onNext('some data');*/
-
-// var detectEnv = require("composite-detect")
-import detectEnv from 'composite-detect'
-import assign from 'fast.js/object/assign'
-
-//import { parseSteps } from './parseHelpers'
-
-export const outputs = ['geometry'] // to be able to auto determine data type(s) fetched by parser
-
-//import Worker from 'workerjs'
-import most from 'most'
-import create from '@most/create'
-import thread from './thread'
-
-/*
-        => webworker (imports) => need duplicated of 'core code' ? !!!!CODE DUPLICATION
-[index] =
-        => span thread => can simply import core code (fallback to commonjs)
-
-
-
-*/
-/*export default function parse (data, parameters = {}) {
-  const worker$ = fromWebWorker('./worker.js')
-  worker$.onNext({data})
-
-  return worker$
-    .map(function (event) {
-      const positions = new Float32Array(event.data.positions)
-      const normals = new Float32Array(event.data.normals)
-      // obs.onCompleted()
-      obs.onNext({progress: 1, total: positions.length, data: {positions, normals}})
-    })
-    .catch(function (event) {
-      return `filename:${event.filename} lineno: ${event.lineno} error: ${event.message}`
-      // e => worker.terminate() ????
-    })
-}*/
-
-class Worker {
-  constructor (path) {
-    this.path = path
-  }
-  postMessage (message) {
-    console.log('message', message)
-  }
-  /*onError (error) {
-    console.log(error)
-  }*/
+// helper for file size display from http://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
+function formatBytes (bytes, decimals) {
+  if (bytes === 0) return '0 Byte'
+  var k = 1000 // or 1024 for binary
+  var dm = decimals + 1 || 3
+  var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+  var i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
-export default function parse (data, parameters = {}) {
-  //const obs = new Rx.ReplaySubject(1)
-  const worker = thread('./worker.js') // new Worker('./worker.js') // browserify // __dirname + '/worker.js', true)
+// not worker based, for dev/testing
+import { default as makeStlStreamParser } from './parsers/stl/parseStream'
+function repeat (times, fn, params) {
+  for (var i = 0; i < times; i++) {
+    fn(params)
+  }
+}
 
-  const stream = create(function (add, end, error) {
-    worker.onmessage = function (event) {
-      console.log('on message', event)
-      const positions = new Float32Array(event.data.positions)
-      const normals = new Float32Array(event.data.normals)
+function handleFileSelect (e) {
+  e.stopPropagation()
+  e.preventDefault()
 
-      add({progress: 1, total: positions.length, data: {positions, normals}})
-      end()
-
-      /*obs.onNext({progress: 1, total:positions.length})
-      obs.onNext(geometry)*/
-    }
-    worker.onerror = function (event) {
-      error(`filename:${event.filename} lineno: ${event.lineno} error: ${event.message}`)
-      //obs.onError(`filename:${event.filename} lineno: ${event.lineno} error: ${event.message}`)
-    }
-    worker.postMessage({data})
-    //obs.catch(e => worker.terminate())
-    return () => { worker.terminate() }
+  // files is a FileList of File objects. List some properties.
+  let files = []
+  for (var i = 0, f; f = e.dataTransfer.files[i]; i++) {
+    files.push(f)
+  }
+  let output = files.map(function (f) {
+    return `<li>
+      <strong> ${escape(f.name)} </strong> (${f.type || 'n/a' }) - ${f.size} bytes,
+      last modified: ${f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a'}
+      </li>`
   })
 
-  return stream
+  document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>'
+
+  const testCount = 1
+
+  function testRunTransferable () {
+    readFileBasic(files[0]).then(workerSpawner.bind(null, {transferable: true}))
+  }
+
+  function testRunCopy () {
+    readFileBasic(files[0]).then(workerSpawner.bind(null, {transferable: false}))
+  }
+
+  function testRunStreamBlock () {
+    const concat = require('concat-stream')
+
+    const workerStream = streamWorkerSpawner.bind(null, {transferable: false})()
+    fileReaderStream(files[0], {chunkSize: 9999999999}).pipe(workerStream)
+  /*.pipe(concat(function(data) {
+    console.log('after worker')
+  }))*/
+  }
+
+  function testRunStream () {
+  }
+
+  console.log(`Results for file size: ${formatBytes(files[0].size)}`)
+
+  repeat(testCount, testRunTransferable, files[0])
+  // repeat(testCount, testRunCopy, files[0])
+  // repeat(testCount, testRunStreamBlock, files[0])
+
+  // parseStlAsStreamNoWorker(fileReaderStream, files)
+  parseStlAsStreamWorker(fileReaderStream, files)
 }
 
-/*export function parse_old (data, parameters = {}) {
-  const defaults = {
-    useWorker: (detectEnv.isBrowser === true)
-  }
-  parameters = assign({}, defaults, parameters)
-  const {useWorker} = parameters
+function handleDragOver (e) {
+  e.stopPropagation()
+  e.preventDefault()
+  e.dataTransfer.dropEffect = 'copy' // Explicitly show this is a copy.
+}
 
-  const obs = new Rx.ReplaySubject(1)
-
-  if (useWorker) {
-    // var Worker = require("./worker.js")//Webpack worker!
-    // var worker = new Worker
-
-    // TODO: for node.js side use https://github.com/audreyt/node-webworker-threads for similar speedups
-    //or rather https://github.com/eugeneware/workerjs
-    let worker = new Worker('./worker.js') // browserify
-    worker.onmessage = function (event) {
-      const positions = new Float32Array(event.data.positions)
-      const normals = new Float32Array(event.data.normals)
-      const geometry = {positions, normals}
-
-      obs.onNext({progress: 1, total: positions.length, data: geometry})
-      obs.onCompleted()
-    }
-    worker.onerror = function (event) {
-      obs.onError(`filename:${event.filename} lineno: ${event.lineno} error: ${event.message}`)
-    }
-
-    worker.postMessage({data})
-    obs.catch(e => worker.terminate())
-  } else {
-    try {
-      let result = parseSteps(data)
-      obs.onNext({progress: 1, total: result.positions.length, data: result})
-      obs.onCompleted()
-    } catch (error) {
-      obs.onError(error)
-    }
-  }
-
-  return obs
-}*/
+// Setup the dnd listeners.
+let dropZone = document.getElementById('drop_zone')
+dropZone.addEventListener('dragover', handleDragOver, false)
+dropZone.addEventListener('drop', handleFileSelect, false)
