@@ -2,10 +2,6 @@ import test from 'ava'
 // import fs from 'fs' //does not work with babel + brfs
 const fs = require('fs')
 
-// these two are needed by the parser
-// import Rx from 'rx'
-// let Rx = require('rx')
-import assign from 'fast.js/object/assign'
 import makeStlStream from '../src/index'
 import concat from 'concat-stream'
 
