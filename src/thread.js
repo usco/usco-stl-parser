@@ -1,23 +1,29 @@
-
-
-
-
-export default function thread(path){
-  let browser = true
-  if(browser){
-    const worker = new Worker('./worker.js')
+export default function thread (path) {
+  let browser = false
+  if (browser) {
+    //const worker = new Worker('./worker.js')
+    const worker = {}
     return worker
-  }else{
+  } else {
+    console.log('command line')
     const exec = require('child_process').exec
-    const cmd = require(path)
-    console.log('cmd',cmd, path)
-    let child = exec(cmd)
+    //const cmd = require(path)
+    console.log('cmd', cmd, path)
+    let child = exec(path)
 
     let wrapper = {
-
+      postMessage: function (data) {
+        console.log('postMessage')
+      },
+      onmessage: function (data) {
+        console.log('onmessage')
+      },
+      onerror: function (error) {
+        console.log('onerror')
+      }
     }
     child.stdout.on('data', function (data) {
-      // console.log("stdout",data)
+      console.log("stdout",data)
       wrapper.onmessage(data)
     })
     child.stderr.on('data', function (data) {

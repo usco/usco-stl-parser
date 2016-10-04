@@ -4,7 +4,7 @@
  * @author gero3 / https://github.com/gero3
  * @author kaosat-dev / https://github.com/kaosat-dev
  *
- * Description: A THREE parser for STL ASCII files & BINARY, as created by Solidworks and other CAD programs.
+ * Description: A parser for STL ASCII files & BINARY, as created by Solidworks and other CAD programs.
  *
  * Supports both binary and ASCII encoded files, with automatic detection of type.
  *
@@ -37,14 +37,23 @@ worker.onNext('some data');*/
 import detectEnv from 'composite-detect'
 import assign from 'fast.js/object/assign'
 
-import { parseSteps } from './parseHelpers'
+//import { parseSteps } from './parseHelpers'
 
 export const outputs = ['geometry'] // to be able to auto determine data type(s) fetched by parser
 
 //import Worker from 'workerjs'
 import most from 'most'
+import create from '@most/create'
 import thread from './thread'
 
+/*
+        => webworker (imports) => need duplicated of 'core code' ? !!!!CODE DUPLICATION
+[index] =
+        => span thread => can simply import core code (fallback to commonjs)
+
+
+
+*/
 /*export default function parse (data, parameters = {}) {
   const worker$ = fromWebWorker('./worker.js')
   worker$.onNext({data})
@@ -78,15 +87,12 @@ export default function parse (data, parameters = {}) {
   //const obs = new Rx.ReplaySubject(1)
   const worker = thread('./worker.js') // new Worker('./worker.js') // browserify // __dirname + '/worker.js', true)
 
-  const stream = most.create(function (add, end, error) {
+  const stream = create(function (add, end, error) {
     worker.onmessage = function (event) {
       console.log('on message', event)
       const positions = new Float32Array(event.data.positions)
       const normals = new Float32Array(event.data.normals)
 
-
-      //obs.onNext({progress: 1, total: positions.length, data: {positions, normals}})
-      //obs.onCompleted()
       add({progress: 1, total: positions.length, data: {positions, normals}})
       end()
 
