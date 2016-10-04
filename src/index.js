@@ -1,88 +1,48 @@
-import fileReaderStream from 'filereader-stream'
-import readFileBasic from './readFileBasic'
-import workerSpawner from './workers/spawners/workerSpawner'
-import streamWorkerSpawner from './workers/spawners/streamWorkerSpawner'
-import parseStlAsStreamNoWorker from './parseStlAsStreamNoWorker'
-import parseStlAsStreamWorker from './parseStlAsStreamWorker'
+/**
+ * @author kaosat-dev / https://github.com/kaosat-dev
+ * @author aleeper / http://adamleeper.com/
+ * @author mrdoob / http://mrdoob.com/
+ * @author gero3 / https://github.com/gero3
+ *
+ * Description: A parser for STL ASCII files & BINARY, as created by Solidworks and other CAD programs.
+ *
+ * Supports both binary and ASCII encoded files, with automatic detection of type.
+ *
+ * Limitations:
+ *  Binary decoding ignores header. There doesn't seem to be much of a use for it.
+ *  There is perhaps some question as to how valid it is to always assume little-endian-ness.
+ *  ASCII decoding assumes file is UTF-8. Seems to work for the examples...
+ *
+ * Usage:
+**/
 
-// var foo = require('./workers/spawners/testSpawnWorker')
+import detectEnv from 'composite-detect'
+import concat from 'concat-stream'
+import workerSpawner from './workerspawner'
+import makeStlStreamParser from './parseStreamAlt'
 
-// helper for file size display from http://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
-function formatBytes (bytes, decimals) {
-  if (bytes === 0) return '0 Byte'
-  var k = 1000 // or 1024 for binary
-  var dm = decimals + 1 || 3
-  var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-  var i = Math.floor(Math.log(bytes) / Math.log(k))
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+export default function parse (inputStream, parameters = {}) {
+  const defaults = {
+    useWorker: (detectEnv.isBrowser === true)
+  }
+  parameters = Object.assign({}, defaults, parameters)
+  const {useWorker} = parameters
+
+  const parseStep = useWorker ? workerSpawner() : makeStlStreamParser()
+
+  return inputStream
+    .pipe(parseStep)
+    .pipe(concat(function (data) {
+      //console.log('FUUUUend of data',data)
+      let positions = data.slice(0, data.length / 2)
+      let normals = data.slice(data.length / 2)
+
+      positions = new Float32Array(positions.buffer.slice(positions.byteOffset, positions.byteOffset + positions.byteLength)) //
+      normals = new Float32Array(normals.buffer.slice(normals.byteOffset, normals.byteOffset + normals.byteLength))
+      return {
+        positions: positions,
+        normals: normals
+      }
+
+    }))
 }
-
-// not worker based, for dev/testing
-import { default as makeStlStreamParser } from './parsers/stl/parseStream'
-function repeat (times, fn, params) {
-  for (var i = 0; i < times; i++) {
-    fn(params)
-  }
-}
-
-function handleFileSelect (e) {
-  e.stopPropagation()
-  e.preventDefault()
-
-  // files is a FileList of File objects. List some properties.
-  let files = []
-  for (var i = 0, f; f = e.dataTransfer.files[i]; i++) {
-    files.push(f)
-  }
-  let output = files.map(function (f) {
-    return `<li>
-      <strong> ${escape(f.name)} </strong> (${f.type || 'n/a' }) - ${f.size} bytes,
-      last modified: ${f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a'}
-      </li>`
-  })
-
-  document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>'
-
-  const testCount = 1
-
-  function testRunTransferable () {
-    readFileBasic(files[0]).then(workerSpawner.bind(null, {transferable: true}))
-  }
-
-  function testRunCopy () {
-    readFileBasic(files[0]).then(workerSpawner.bind(null, {transferable: false}))
-  }
-
-  function testRunStreamBlock () {
-    const concat = require('concat-stream')
-
-    const workerStream = streamWorkerSpawner.bind(null, {transferable: false})()
-    fileReaderStream(files[0], {chunkSize: 9999999999}).pipe(workerStream)
-  /*.pipe(concat(function(data) {
-    console.log('after worker')
-  }))*/
-  }
-
-  function testRunStream () {
-  }
-
-  console.log(`Results for file size: ${formatBytes(files[0].size)}`)
-
-  repeat(testCount, testRunTransferable, files[0])
-  // repeat(testCount, testRunCopy, files[0])
-  // repeat(testCount, testRunStreamBlock, files[0])
-
-  // parseStlAsStreamNoWorker(fileReaderStream, files)
-  parseStlAsStreamWorker(fileReaderStream, files)
-}
-
-function handleDragOver (e) {
-  e.stopPropagation()
-  e.preventDefault()
-  e.dataTransfer.dropEffect = 'copy' // Explicitly show this is a copy.
-}
-
-// Setup the dnd listeners.
-let dropZone = document.getElementById('drop_zone')
-dropZone.addEventListener('dragover', handleDragOver, false)
-dropZone.addEventListener('drop', handleFileSelect, false)
