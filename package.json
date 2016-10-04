@@ -13,17 +13,18 @@
     "through2": "^2.0.1"
   },
   "devDependencies": {
-    "concat-stream": "^1.5.2",
     "assert": "^1.3.0",
     "ava": "^0.16.0",
     "babel-cli": "^6.6.5",
     "babel-core": "^6.2.1",
     "babel-preset-es2015": "^6.1.18",
+    "babel-register": "^6.16.3",
     "babelify": "^7.2.0",
     "brfs": "^1.4.1",
     "browserify": "^13.0.0",
     "browserify-shim": "^3.8.11",
     "browserify-test": "^2.1.2",
+    "concat-stream": "^1.5.2",
     "workerify": "^0.3.0"
   },
   "scripts": {
