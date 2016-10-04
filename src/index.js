@@ -4,7 +4,8 @@
  * @author mrdoob / http://mrdoob.com/
  * @author gero3 / https://github.com/gero3
  *
- * Description: A parser for STL ASCII files & BINARY, as created by Solidworks and other CAD programs.
+ * Description: A streaming (node.js streams) parser for STL ASCII files & BINARY,
+ * as created by Solidworks and other CAD programs. Optimised both for speed and low memory consumption
  *
  * Supports both binary and ASCII encoded files, with automatic detection of type.
  *
@@ -20,20 +21,22 @@ import detectEnv from 'composite-detect'
 import concat from 'concat-stream'
 import workerSpawner from './workerspawner'
 import makeStlStreamParser from './parseStreamAlt'
+import through2 from 'through2'
 
-export default function parse (inputStream, parameters = {}) {
+
+export default function makeStlStream (parameters = {}) {
   const defaults = {
     useWorker: (detectEnv.isBrowser === true)
   }
   parameters = Object.assign({}, defaults, parameters)
   const {useWorker} = parameters
 
-  const parseStep = useWorker ? workerSpawner() : makeStlStreamParser()
+  const parseStep = through2(makeStlStreamParser())//useWorker ? workerSpawner() : makeStlStreamParser()
 
-  return inputStream
-    .pipe(parseStep)
+  //console.log('parseStep', parseStep
+  return parseStep
     .pipe(concat(function (data) {
-      //console.log('FUUUUend of data',data)
+      console.log('FUUUUend of data',data.length)
       let positions = data.slice(0, data.length / 2)
       let normals = data.slice(data.length / 2)
 
@@ -43,6 +46,5 @@ export default function parse (inputStream, parameters = {}) {
         positions: positions,
         normals: normals
       }
-
     }))
 }
