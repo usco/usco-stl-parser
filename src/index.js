@@ -18,7 +18,7 @@
 **/
 
 import detectEnv from 'composite-detect'
-import workerSpawner from './workerspawner'
+import workerSpawner from './workerSpawner'
 import makeStreamParser from './parseStream'
 import through2 from 'through2'
 
