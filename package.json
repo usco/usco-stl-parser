@@ -6,8 +6,8 @@
     "type": "git",
     "url": "http://github.com/usco/usco-stl-parser.git"
   },
-  "main": "lib/server/index.js",
-  "browser": "lib/browser/stl-parser.js",
+  "main": "lib/index.js",
+  "jsnext:main": "src/index.js",
   "dependencies": {
     "composite-detect": "0.0.3",
     "through2": "^2.0.1"
@@ -28,7 +28,7 @@
     "workerify": "^0.3.0"
   },
   "scripts": {
-    "browserify": "browserify src/index.js -t babelify -t workerify -t browserify-shim --standalone stl-parser --exclude rx --outfile lib/browser/stl-parser.js",
+    "browserify": "browserify src/index.js -t babelify -t workerify -t --standalone stl-parser --outfile lib/browser/stl-parser.js",
     "browserify-worker": "NODE_ENV=production && browserify src/stlStreamWorker.src.js -t babelify -t workerify -t --outfile src/stlStreamWorker.js",
     "test": "ava './test/**/*.spec.js' --require babel-register --verbose",
     "build-brs": "npm run browserify",
@@ -38,10 +38,6 @@
     "release-patch": "git checkout master && npm run build; git commit -a -m 'chore(dist): built release/'; npm version patch && git push origin master --tags ",
     "release-minor": "git checkout master && npm run build; git commit -a -m 'chore(dist): built release/'; npm version minor && git push origin master --tags ",
     "release-major": "git checkout master && npm run build; git commit -a -m 'chore(dist): built release/'; npm version major && git push origin master --tags "
-  },
-  "browserify-shim": {
-    "rx": "global:Rx",
-    "most": "global:most"
   },
   "browserify": {
     "transform": [
