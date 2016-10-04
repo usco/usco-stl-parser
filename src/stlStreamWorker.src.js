@@ -1,4 +1,4 @@
-import { default as makeStlStreamParser } from '../../parsers/stl/parseStreamAlt'
+import makeStlStreamParser from './parseStreamAlt'
 const stlStreamParser = makeStlStreamParser()
 
 self.onmessage = function (event) {

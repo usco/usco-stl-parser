@@ -1,7 +1,6 @@
 const Duplex = require('stream').Duplex
-const WebWorkify = require('webworkify')
 
-class WorkerStream extends Duplex {
+export default class WorkerStream extends Duplex {
   constructor (path) {
     super()
     this.worker = typeof path === 'string' ? new Worker(path) : path
@@ -84,11 +83,4 @@ class WorkerStream extends Duplex {
 
     //this._dealWithData()
   }
-}
-
-export default function workerStreamParser () {
-  // const worker = WebWorkify(require('../workers/stlStreamWorker2.src.js'))
-  const worker = 'src/workers/workers/stlStreamWorker2.js'
-  const ws = new WorkerStream(worker)
-  return ws
 }
