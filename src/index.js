@@ -23,7 +23,6 @@ import workerSpawner from './workerspawner'
 import makeStlStreamParser from './parseStreamAlt'
 import through2 from 'through2'
 
-
 export default function makeStlStream (parameters = {}) {
   const defaults = {
     useWorker: (detectEnv.isBrowser === true)
@@ -31,12 +30,12 @@ export default function makeStlStream (parameters = {}) {
   parameters = Object.assign({}, defaults, parameters)
   const {useWorker} = parameters
 
-  const parseStep = through2(makeStlStreamParser())//useWorker ? workerSpawner() : makeStlStreamParser()
+  const parseStep = useWorker ? workerSpawner() : through2(makeStlStreamParser())()
 
-  //console.log('parseStep', parseStep
+  // console.log('parseStep', parseStep
   return parseStep
     .pipe(concat(function (data) {
-      console.log('FUUUUend of data',data.length)
+      console.log('FUUUUend of data', data.length)
       let positions = data.slice(0, data.length / 2)
       let normals = data.slice(data.length / 2)
 
