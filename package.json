@@ -7,7 +7,7 @@
     "url": "http://github.com/usco/usco-stl-parser.git"
   },
   "main": "lib/index.js",
-  "jsnext:main": "src/index.js",
+  "module": "src/index.js",
   "dependencies": {
     "composite-detect": "0.0.3",
     "through2": "^2.0.1"
