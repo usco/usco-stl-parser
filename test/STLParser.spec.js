@@ -7,25 +7,48 @@ const fs = require('fs')
 // let Rx = require('rx')
 import assign from 'fast.js/object/assign'
 import makeStlStream from '../src/index'
-// import parse, {outputs}'../lib/stl-parser'
+import concat from 'concat-stream'
 
 test.cb('STL parser tests: can parse ascii stl files', t => {
   // this.timeout(5000)
   fs.createReadStream('./data/slotted_disk_ascii.stl', { encoding: null, highWaterMark: 512 * 1024 }) // 'binary'
     .pipe(makeStlStream())
-    .on('data', function (parsedSTL) {
+    .pipe(concat(function (data) {
+      let positions = data.slice(0, data.length / 2)
+      let normals = data.slice(data.length / 2)
+
+      positions = new Float32Array(positions.buffer.slice(positions.byteOffset, positions.byteOffset + positions.byteLength)) //
+      normals = new Float32Array(normals.buffer.slice(normals.byteOffset, normals.byteOffset + normals.byteLength))
+      const parsedSTL = {
+        positions: positions,
+        normals: normals
+      }
+    //.on('data', function (parsedSTL) {
       t.deepEqual(parsedSTL.positions.length / 3, 864) // we divide by three because each entry is 3 long
       t.end()
-    })
+    }))
 })
 
 test.cb('STL parser tests: can parse binary stl files', t => {
    fs.createReadStream('./data/pr2_head_pan_bin.stl')
     .pipe(makeStlStream()) // we get a stream back
-    .on('data', function (parsedSTL) {
+    .pipe(concat(function (data) {
+      let positions = data.slice(0, data.length / 2)
+      let normals = data.slice(data.length / 2)
+
+      positions = new Float32Array(positions.buffer.slice(positions.byteOffset, positions.byteOffset + positions.byteLength)) //
+      normals = new Float32Array(normals.buffer.slice(normals.byteOffset, normals.byteOffset + normals.byteLength))
+      const parsedSTL = {
+        positions: positions,
+        normals: normals
+      }
       t.deepEqual(parsedSTL.positions.length / 3, 3000) // we divide by three because each entry is 3 long
       t.end()
-    })
+    }))
+    /*.on('data', function (parsedSTL) {
+      t.deepEqual(parsedSTL.positions.length / 3, 3000) // we divide by three because each entry is 3 long
+      t.end()
+    })*/
 })
 
 /*test.cb('STL parser tests: should handle errors gracefully', t => {
