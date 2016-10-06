@@ -21,8 +21,7 @@ import detectEnv from 'composite-detect'
 import workerSpawner from './workerSpawner'
 import makeStreamParser from './parseStream'
 import through2 from 'through2'
-
-//import concat from 'concat-stream'
+//import concatStream from './concatStream'
 
 export default function makeStlStream (parameters = {}) {
   const defaults = {
@@ -35,16 +34,4 @@ export default function makeStlStream (parameters = {}) {
 
   // console.log('parseStep', parseStep
   return parseStep
-    /*.pipe(concat(function (data) {
-      console.log('FUUUUend of data', data.length)
-      let positions = data.slice(0, data.length / 2)
-      let normals = data.slice(data.length / 2)
-
-      positions = new Float32Array(positions.buffer.slice(positions.byteOffset, positions.byteOffset + positions.byteLength)) //
-      normals = new Float32Array(normals.buffer.slice(normals.byteOffset, normals.byteOffset + normals.byteLength))
-      return {
-        positions: positions,
-        normals: normals
-      }
-    }))*/
 }

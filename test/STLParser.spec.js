@@ -4,11 +4,27 @@ const fs = require('fs')
 
 import makeStlStream from '../src/index'
 import concat from 'concat-stream'
+//import concatStream from '../src/concatStream'
+
 
 test.cb('STL parser tests: can parse ascii stl files', t => {
   // this.timeout(5000)
   fs.createReadStream('./data/slotted_disk_ascii.stl', { encoding: null, highWaterMark: 512 * 1024 }) // 'binary'
     .pipe(makeStlStream())
+    /*.pipe(concatStream(function (data) {
+      console.log('finally !',data.length)
+
+      let positions = data.slice(0, data.length / 2)
+      let normals = data.slice(data.length / 2)
+
+      positions = new Float32Array(positions.buffer.slice(positions.byteOffset, positions.byteOffset + positions.byteLength)) //
+      normals = new Float32Array(normals.buffer.slice(normals.byteOffset, normals.byteOffset + normals.byteLength))
+      const parsedSTL = {
+        positions: positions,
+        normals: normals
+      }
+      return parsedSTL
+    }))*/
     .pipe(concat(function (data) {
       let positions = data.slice(0, data.length / 2)
       let normals = data.slice(data.length / 2)
@@ -41,10 +57,6 @@ test.cb('STL parser tests: can parse binary stl files', t => {
       t.deepEqual(parsedSTL.positions.length / 3, 3000) // we divide by three because each entry is 3 long
       t.end()
     }))
-    /*.on('data', function (parsedSTL) {
-      t.deepEqual(parsedSTL.positions.length / 3, 3000) // we divide by three because each entry is 3 long
-      t.end()
-    })*/
 })
 
 /*test.cb('STL parser tests: should handle errors gracefully', t => {
