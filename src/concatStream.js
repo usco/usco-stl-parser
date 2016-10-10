@@ -25,12 +25,35 @@ function bufferConcat (parts) {
   return Buffer.concat(bufs)
 }
 
+function customConcat( parts ){
+  let positionBufs = []
+  let normalBufs = []
+
+  for (var i = 0; i < parts.length; i++) {
+    let p = parts[i]
+    if (Buffer.isBuffer(p)) {
+      let positions = p.slice(0, p.length/2)
+      let normals = p.slice(p.length / 2)
+      positionBufs.push(positions)
+      normalBufs.push(normals)
+    }
+  }
+
+  const pBuf = Buffer.concat(positionBufs)
+  const nBuf = Buffer.concat(normalBufs)
+
+  return {
+    positions: new Float32Array(pBuf.buffer.slice(pBuf.byteOffset, pBuf.byteOffset + pBuf.byteLength)),
+    normals: new Float32Array(nBuf.buffer.slice(nBuf.byteOffset, nBuf.byteOffset + nBuf.byteLength))
+  }
+}
+
 class Formatter extends Duplex {
   constructor (processorFn) {
     super({readableObjectMode: true})
     this.body = []
     this.on('finish', function () {
-      const result = processorFn(bufferConcat(this.body))
+      const result = processorFn(customConcat(this.body))
       this.push(result)
       this.emit('end')
     })
