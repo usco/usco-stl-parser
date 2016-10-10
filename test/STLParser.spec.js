@@ -3,58 +3,27 @@ import test from 'ava'
 const fs = require('fs')
 
 import makeStlStream from '../src/index'
-import concat from 'concat-stream'
-//import concatStream from '../src/concatStream'
-
+import concatStream from '../src/concatStream'
 
 test.cb('STL parser tests: can parse ascii stl files', t => {
   // this.timeout(5000)
   fs.createReadStream('./data/slotted_disk_ascii.stl', { encoding: null, highWaterMark: 512 * 1024 }) // 'binary'
     .pipe(makeStlStream())
-    /*.pipe(concatStream(function (data) {
-      console.log('finally !',data.length)
-
-      let positions = data.slice(0, data.length / 2)
-      let normals = data.slice(data.length / 2)
-
-      positions = new Float32Array(positions.buffer.slice(positions.byteOffset, positions.byteOffset + positions.byteLength)) //
-      normals = new Float32Array(normals.buffer.slice(normals.byteOffset, normals.byteOffset + normals.byteLength))
-      const parsedSTL = {
-        positions: positions,
-        normals: normals
-      }
-      return parsedSTL
-    }))*/
-    .pipe(concat(function (data) {
-      let positions = data.slice(0, data.length / 2)
-      let normals = data.slice(data.length / 2)
-
-      positions = new Float32Array(positions.buffer.slice(positions.byteOffset, positions.byteOffset + positions.byteLength)) //
-      normals = new Float32Array(normals.buffer.slice(normals.byteOffset, normals.byteOffset + normals.byteLength))
-      const parsedSTL = {
-        positions: positions,
-        normals: normals
-      }
-    //.on('data', function (parsedSTL) {
+    .pipe(concatStream(function (parsedSTL) {
       t.deepEqual(parsedSTL.positions.length / 3, 864) // we divide by three because each entry is 3 long
+      t.deepEqual(parsedSTL.positions[0], -0.025066649541258812)
+      t.deepEqual(parsedSTL.positions[parsedSTL.positions.length - 1], 0.019999999552965164)
       t.end()
     }))
 })
 
 test.cb('STL parser tests: can parse binary stl files', t => {
-   fs.createReadStream('./data/pr2_head_pan_bin.stl')
+  fs.createReadStream('./data/pr2_head_pan_bin.stl')
     .pipe(makeStlStream()) // we get a stream back
-    .pipe(concat(function (data) {
-      let positions = data.slice(0, data.length / 2)
-      let normals = data.slice(data.length / 2)
-
-      positions = new Float32Array(positions.buffer.slice(positions.byteOffset, positions.byteOffset + positions.byteLength)) //
-      normals = new Float32Array(normals.buffer.slice(normals.byteOffset, normals.byteOffset + normals.byteLength))
-      const parsedSTL = {
-        positions: positions,
-        normals: normals
-      }
+    .pipe(concatStream(function (parsedSTL) {
       t.deepEqual(parsedSTL.positions.length / 3, 3000) // we divide by three because each entry is 3 long
+      t.deepEqual(parsedSTL.positions[0], -0.07563293725252151)
+      t.deepEqual(parsedSTL.positions[parsedSTL.positions.length - 1], 0.07198309153318405)
       t.end()
     }))
 })
