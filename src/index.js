@@ -21,7 +21,9 @@ import detectEnv from 'composite-detect'
 import workerSpawner from './workerSpawner'
 import makeStreamParser from './parseStream'
 import through2 from 'through2'
-//import concatStream from './concatStream'
+
+// re-export for api
+export { default as concatStream } from './concatStream'
 
 export default function makeStlStream (parameters = {}) {
   const defaults = {
@@ -30,8 +32,5 @@ export default function makeStlStream (parameters = {}) {
   parameters = Object.assign({}, defaults, parameters)
   const {useWorker} = parameters
 
-  const parseStep = useWorker ? workerSpawner() : through2(makeStreamParser())
-
-  // console.log('parseStep', parseStep
-  return parseStep
+  return useWorker ? workerSpawner() : through2(makeStreamParser())
 }
