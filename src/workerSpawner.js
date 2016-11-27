@@ -1,5 +1,5 @@
 import WorkerStream from './WorkerStream'
-import WebWorkify from 'WebWorkify'
+import WebWorkify from 'webWorkify'
 //import foo from './foo'
 export default function workerSpawner () {
   //const worker = new Worker('./stlStreamWorker.src.js')
