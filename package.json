@@ -6,7 +6,7 @@
     "type": "git",
     "url": "http://github.com/usco/usco-stl-parser.git"
   },
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "module": "src/index.js",
   "dependencies": {
     "composite-detect": "0.0.3",
@@ -24,16 +24,11 @@
     "browserify": "^13.0.0",
     "browserify-shim": "^3.8.11",
     "browserify-test": "^2.1.2",
-    "concat-stream": "^1.5.2",
-    "workerify": "^0.3.0"
+    "concat-stream": "^1.5.2"
   },
   "scripts": {
-    "browserify": "browserify src/index.js -t babelify -t workerify -t --standalone stl-parser --outfile lib/browser/stl-parser.js",
-    "browserify-worker": "NODE_ENV=production && browserify src/stlStreamWorker.src.js -t babelify -t workerify -t --outfile src/stlStreamWorker.js",
     "test": "ava './test/**/*.spec.js' --require babel-register --verbose",
-    "build-brs": "npm run browserify",
-    "build-srv": "babel -d lib/server src/",
-    "build": "npm run build-srv && npm run build-brs",
+    "build": "babel src/ -d dist",
     "release": "npm run release-patch",
     "release-patch": "git checkout master && npm run build; git commit -a -m 'chore(dist): built release/'; npm version patch && git push origin master --tags ",
     "release-minor": "git checkout master && npm run build; git commit -a -m 'chore(dist): built release/'; npm version minor && git push origin master --tags ",
