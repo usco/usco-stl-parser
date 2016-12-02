@@ -1,5 +1,5 @@
 const Duplex = require('stream').Duplex
-//stream-combiner2
+// stream-combiner2
 // a lot of this is taken from https://github.com/maxogden/concat-stream, with gratitude!
 
 function isArrayish (arr) {
@@ -25,14 +25,14 @@ function bufferConcat (parts) {
   return Buffer.concat(bufs)
 }
 
-function customConcat( parts ){
+function customConcat (parts) {
   let positionBufs = []
   let normalBufs = []
 
   for (var i = 0; i < parts.length; i++) {
     let p = parts[i]
     if (Buffer.isBuffer(p)) {
-      let positions = p.slice(0, p.length/2)
+      let positions = p.slice(0, p.length / 2)
       let normals = p.slice(p.length / 2)
       positionBufs.push(positions)
       normalBufs.push(normals)
@@ -50,6 +50,7 @@ function customConcat( parts ){
 
 class Formatter extends Duplex {
   constructor (processorFn) {
+    processorFn = processorFn || function (data) {return data}
     super({readableObjectMode: true})
     this.body = []
     this.on('finish', function () {

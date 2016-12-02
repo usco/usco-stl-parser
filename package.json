@@ -9,6 +9,7 @@
   "main": "dist/index.js",
   "module": "src/index.js",
   "dependencies": {
+    "combining": "^0.1.1",
     "composite-detect": "0.0.3",
     "through2": "^2.0.1",
     "webworkify": "^1.4.0"

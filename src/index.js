@@ -21,16 +21,23 @@ import detectEnv from 'composite-detect'
 import workerSpawner from './workerSpawner'
 import makeStreamParser from './parseStream'
 import through2 from 'through2'
+import combine from 'combining'
 
 // re-export for api
 export { default as concatStream } from './concatStream'
+import concatStream from './concatStream'
 
 export default function makeStlStream (parameters = {}) {
   const defaults = {
-    useWorker: (detectEnv.isBrowser === true)
+    useWorker: (detectEnv.isBrowser === true),
+    concat: true
   }
   parameters = Object.assign({}, defaults, parameters)
-  const {useWorker} = parameters
+  const {useWorker, concat} = parameters
 
-  return useWorker ? workerSpawner() : through2(makeStreamParser())
+  const mainStream = useWorker ? workerSpawner() : through2(makeStreamParser())
+  // concatenate result into a single one if needed (still streaming)
+  const endStream = concat ? combine()(mainStream, concatStream()) : mainStream
+
+  return endStream
 }
