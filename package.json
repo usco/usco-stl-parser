@@ -28,7 +28,7 @@
     "concat-stream": "^1.5.2"
   },
   "scripts": {
-    "test": "ava './test/**/*.spec.js' --require babel-register --verbose",
+    "test": "ava './test/**/*.test.js' --require babel-register --verbose",
     "build": "babel src/ -d dist",
     "release": "npm run release-patch",
     "release-patch": "git checkout master && npm run build; git commit -a -m 'chore(dist): built release/'; npm version patch && git push origin master --tags ",
