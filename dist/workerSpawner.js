@@ -17,7 +17,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function workerSpawner() {
   //const worker = new Worker('./stlStreamWorker.src.js')
-  var worker = (0, _webWorkify2.default)(require('./stlStreamWorker.js'));
+  var worker = (0, _webWorkify2.default)(require('./worker.js'));
   var ws = new _WorkerStream2.default(worker);
   return ws;
 }
