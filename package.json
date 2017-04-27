@@ -31,9 +31,9 @@
     "test": "ava './test/**/*.test.js' --require babel-register --verbose",
     "build": "babel src/ -d dist",
     "release": "npm run release-patch",
-    "release-patch": "git checkout master && npm run build; git commit -a -m 'chore(dist): built release/'; npm version patch && git push origin master --tags ",
-    "release-minor": "git checkout master && npm run build; git commit -a -m 'chore(dist): built release/'; npm version minor && git push origin master --tags ",
-    "release-major": "git checkout master && npm run build; git commit -a -m 'chore(dist): built release/'; npm version major && git push origin master --tags "
+    "release-patch": "git checkout master; npm run build && npm version patch && npm run build; git commit -a -m 'chore(dist): built dist/'; git push origin master --tags ",
+    "release-minor": "git checkout master; npm run build && npm version minor && npm run build; git commit -a -m 'chore(dist): built dist/'; git push origin master --tags ",
+    "release-major": "git checkout master; npm run build && npm version major && npm run build; git commit -a -m 'chore(dist): built dist/'; git push origin master --tags "
   },
   "browserify": {
     "transform": [
