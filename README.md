@@ -1,12 +1,13 @@
 # usco-stl-parser
 
+> Fast and efficient [stl](https://en.wikipedia.org/wiki/STL_(file_format)) format parser
+
 [![GitHub version](https://badge.fury.io/gh/usco%2Fusco-stl-parser.svg)](https://badge.fury.io/gh/usco%2Fusco-stl-parser)
 
 [![Build Status](https://travis-ci.org/usco/usco-stl-parser.svg?branch=master)](https://travis-ci.org/usco/usco-stl-parser)
 [![Dependency Status](https://david-dm.org/usco/usco-stl-parser.svg)](https://david-dm.org/usco/usco-stl-parser)
 [![devDependency Status](https://david-dm.org/usco/usco-stl-parser/dev-status.svg)](https://david-dm.org/usco/usco-stl-parser#info=devDependencies)
 
-> Fast and efficient [stl](https://en.wikipedia.org/wiki/STL_(file_format)) format parser
 
 - Optimized for speed (webworkers)
 - And low memory consumption (streams)
@@ -61,7 +62,7 @@ npm i @usco/stl-parser
 
 works something like this
 
-raw data stream => raw chunks => | worker | => parsed chunks => concat 
+raw data stream => raw chunks => | worker | => parsed chunks => concat
 
 only exports a single function:
 
