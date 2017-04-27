@@ -1,13 +1,12 @@
 import test from 'ava'
-// import fs from 'fs' //does not work with babel + brfs
 const fs = require('fs')
 
-import makeStlStream from '../src/index'
+import makeParsedStream from '../src/index'
 
 test.cb('STL parser tests: can parse ascii stl files', t => {
   // this.timeout(5000)
   fs.createReadStream('./data/slotted_disk_ascii.stl', { encoding: null, highWaterMark: 512 * 1024 }) // 'binary'
-    .pipe(makeStlStream({concat: true}))
+    .pipe(makeParsedStream({concat: true}))
     .on('data', function (parsed) {
       t.deepEqual(parsed.positions.length / 3, 864) // we divide by three because each entry is 3 long
       t.deepEqual(parsed.positions[0], -0.025066649541258812)
@@ -18,7 +17,7 @@ test.cb('STL parser tests: can parse ascii stl files', t => {
 
 test.cb('STL parser tests: can parse binary stl files', t => {
   fs.createReadStream('./data/pr2_head_pan_bin.stl')
-    .pipe(makeStlStream({concat: true})) // we get a stream back, passing the concat: true option to get the final result only
+    .pipe(makeParsedStream({concat: true})) // we get a stream back, passing the concat: true option to get the final result only
     .on('data', function (parsed) {
       t.deepEqual(parsed.positions.length / 3, 3000) // we divide by three because each entry is 3 long
       t.deepEqual(parsed.positions[0], -0.07563293725252151)

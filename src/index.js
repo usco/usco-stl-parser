@@ -27,7 +27,6 @@ import combine from 'combining'
 export { default as concatStream } from './concatStream'
 import concatStream from './concatStream'
 
-
 /**
  * parses and return a stream of parsed stl data
  * @param {Object} parameters parameters for the parser
@@ -35,7 +34,7 @@ import concatStream from './concatStream'
  * @param {Boolean} parameters.concat when set to true, stream outputs a single value with all combined data
  * @return {Object} stream of parsed stl data in the form {positions:TypedArray, normals:TypedArray}
  */
-export default function makeStlStream (parameters = {}) {
+export default function makeParsedStream (parameters = {}) {
   const defaults = {
     useWorker: (detectEnv.isBrowser === true),
     concat: true
