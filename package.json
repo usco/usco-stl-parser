@@ -15,27 +15,21 @@
     "webworkify": "^1.4.0"
   },
   "devDependencies": {
-    "ava": "^0.16.0",
+    "ava": "^0.19.1",
     "babel-cli": "^6.24.1",
     "babel-core": "^6.24.1",
     "babel-preset-es2015": "^6.24.1",
-    "babel-register": "^6.24.1",
-    "babelify": "^7.2.0",
-    "brfs": "^1.4.1",
-    "browserify": "^13.3.0",
-    "browserify-shim": "^3.8.14"
+    "babel-register": "^6.24.1"
   },
   "scripts": {
-    "test": "ava './test/**/*.test.js' --require babel-register --verbose",
+    "test": "ava './test/**/*.test.js' --verbose",
     "build": "babel src/ -d dist",
     "release": "npm run release-patch",
     "release-patch": "git checkout master; npm run build && npm version patch && npm run build; git commit -a -m 'chore(dist): built dist/'; git push origin master --tags ",
     "release-minor": "git checkout master; npm run build && npm version minor && npm run build; git commit -a -m 'chore(dist): built dist/'; git push origin master --tags ",
     "release-major": "git checkout master; npm run build && npm version major && npm run build; git commit -a -m 'chore(dist): built dist/'; git push origin master --tags "
   },
-  "browserify": {
-    "transform": [
-      "babelify"
-    ]
+  "ava": {
+    "require": ["babel-register"]
   }
 }
