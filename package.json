@@ -1,13 +1,13 @@
 {
   "name": "@usco/stl-parser",
-  "description":"Fast and efficient stl format parser",
+  "description": "Fast and efficient stl format parser",
   "keywords": [
     "parser",
     "stream",
     "stl",
     "3d"
   ],
-  "version": "2.1.0",
+  "version": "2.1.1",
   "license": "MIT",
   "repository": {
     "type": "git",
