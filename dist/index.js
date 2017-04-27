@@ -13,7 +13,7 @@ Object.defineProperty(exports, 'concatStream', {
     return _interopRequireDefault(_concatStream).default;
   }
 });
-exports.default = makeStlStream;
+exports.default = makeParsedStream;
 
 var _compositeDetect = require('composite-detect');
 
@@ -46,7 +46,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param {Boolean} parameters.concat when set to true, stream outputs a single value with all combined data
  * @return {Object} stream of parsed stl data in the form {positions:TypedArray, normals:TypedArray}
  */
-function makeStlStream() {
+function makeParsedStream() {
   var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
   var defaults = {
